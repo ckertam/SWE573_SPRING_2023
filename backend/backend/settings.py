@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import environ
+import datetime
+from rest_framework import permissions
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'user',
     'rest_framework',
 ]
@@ -132,3 +136,66 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_TOKEN_CLASS': 'myapp.custom_token.CustomToken',
+}
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES": (
+#         "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
+#         "rest_framework.authentication.SessionAuthentication",
+#         "rest_framework.authentication.BasicAuthentication",
+#     ),
+#     # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+#     "PAGE_SIZE": 1000,
+# }
+
+JWT_AUTH = {
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=30),
+    "JWT_ALLOW_REFRESH": True,
+    # 3 days
+    "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(seconds=30),
+    "JWT_AUTH_COOKIE": "JWT",
+}
+
+
+# REST_FRAMEWORK = {
+#     # 'DEFAULT_AUTHENTICATION_CLASSES': (
+#     #     'rest_framework.authentication.TokenAuthentication',
+#     # ),
+#     # 'DEFAULT_RENDERER_CLASSES': (
+#     #     'rest_framework.renderers.JSONRenderer',
+#     # ),
+#     # 'DEFAULT_PERMISSION_CLASSES': (
+#     #     'rest_framework.permissions.IsAuthenticated',
+#     # ),
+#     # 'DEFAULT_THROTTLE_RATES': {
+#     #     'anon': '100/day',
+#     #     'user': '1000/day',
+#     # },
+#     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+#     # 'PAGE_SIZE': 10,
+#     # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+#     # 'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+#     # 'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
+#     # # 'DEFAULT_FILTER_BACKENDS': (
+#     # #     'django_filters.rest_framework.DjangoFilterBackend',
+#     # # ),
+#     # 'DEFAULT_PARSER_CLASSES': [
+#     #     'rest_framework.parsers.JSONParser',
+#     #     'rest_framework.parsers.FormParser',
+#     #     'rest_framework.parsers.MultiPartParser'
+#     # ],
+#     # 'DEFAULT_AUTHENTICATION_CLASSES': (
+#     #     'rest_framework.authentication.TokenAuthentication',
+#     # ),
+#     # 'DEFAULT_PERMISSION_CLASSES': (
+#     #     'rest_framework.permissions.IsAuthenticated',
+#     # ),
+#     'DEFAULT_TOKEN_CLASS': 'myapp.custom_token.CustomToken',
+# }
