@@ -1,18 +1,15 @@
 # views.py
-from rest_framework import generics, status
+from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth import authenticate,login,logout
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import UserRegisterSerializer,UserLoginSerializer
-import rest_framework.exceptions
-from django.http import HttpResponse
-from .models import User,CustomToken
+from rest_framework.authentication import get_authorization_header
+from .serializers import UserRegisterSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from .models import User
+from .authentication import *
 import json
-import jwt
 
-class UserRegistrationView(generics.CreateAPIView):
+class UserRegistrationView(views.APIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
 
@@ -29,9 +26,8 @@ class UserRegistrationView(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
-class UserLoginView(generics.CreateAPIView):
+class UserLoginView(views.APIView):
     queryset = User.objects.all()
-    serializer_class = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
         body = json.loads(request.body)
@@ -48,38 +44,54 @@ class UserLoginView(generics.CreateAPIView):
             return Response({'error': 'Invalid username'}, status=400)
         if user.check_password(password):
             return Response({'error': 'Wrong password'}, status=400)
-
-        #token = Token.objects.create(user=user)
-        payload = {'user_id': user.id}
-        token_string = jwt.encode(payload, 'abcabc', algorithm='HS256')
-
-        # Create Token object
-        try:
-            token = Token.objects.get(user=user)
-            print(token)
-            response = HttpResponse()
-            response.set_cookie(key="jwt", value=token, httponly=True)
-
-            #return response
-            return Response(data = {'message':'Already logged in!', 'username':user.username}, status=status.HTTP_200_OK)
         
-        except:
-            token = Token.objects.create(user=user,key=token_string)
 
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+        print(access_token)
+        print(refresh_token)
+        response = Response()
 
-            print("caner")
-            user_filtered = User.objects.filter(username=request.data.get("username")).first()
-            #user_filtered = authenticate(username=username, password=password)
-            #print(user_filtered)
-            login(request,user_filtered)
-            print("caner3") 
-            response = HttpResponse()
-            response.set_cookie(key="jwt", value=token, httponly=True)
-            
-            #return response
-            
-            return  Response( {'message':'Login succesful!', 'username':username}, status=status.HTTP_200_OK)
+        response.set_cookie(key='refreshToken', value = refresh_token, httponly= True)
+        response.data = {
+            'access': access_token,
+            'refresh' : refresh_token
+        }
+
+        return response
+
+class AuthUserAPIView(views.APIView):
+    def get(self,request):
+        auth = get_authorization_header(request).split()
+        print(auth)
+
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_refresh_token(token)
+
+            user = User.objects.filter(pk=id).first()
+
+            #deneme = User.objects.filter(user=user).first()
+            return Response(user.id)
         
-        
-    
-        #return Response({'message':'Successfully loged in with!', 'username':username}, status=status.HTTP_201_CREATED)
+        raise AuthenticationFailed('unauth')
+
+class RefreshUserAuthAPIView(views.APIView):
+    def post(self,request):
+        refresh_token = request.COOKIES.get('refreshToken')
+
+        id = decode_refresh_token(refresh_token)
+        print(id)
+        access_token = create_access_token(id)
+        return Response({
+            'token': access_token
+        })
+
+class LogutAPIView(views.APIView):
+    def post(self, _):
+        response = Response()
+        response.delete_cookie(key="refreshToken")
+        response.data = {
+            'message': 'success'
+        }
+        return response

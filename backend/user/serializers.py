@@ -15,14 +15,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        email = validated_data.get("email")
-        username = validated_data.get("username")
-        password = validated_data.get("password")
+
 
         if validated_data["password"] != validated_data["password_again"]:
             print("caner")
             raise serializers.ValidationError("Passwords do no match!")
-            return
+            
         user_data = self.Meta.model(**validated_data)
 
         
@@ -52,24 +50,6 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = [
             "username",
             "password",
-            #"token",
             "user",
         ]
         extra_kwargs = {"password": {"write_only": True, "required": False}}
-
-    def validate(self, data):
-        password = data.get("password")
-        username = data.get("username")
-        user = User.objects.filter(username=username).distinct()
-        if user.exists():
-            user_data = user.first()
-        else:
-            raise ValidationError("Incorrect credential")
-        if user_data:
-            if not user_data.check_password(password):
-                raise ValidationError({"detail": "Incorrect credential"})
-        #payload = JWT_PAYLOAD_HANDLER(user_obj)
-        #token = JWT_ENCODE_HANDLER(payload)
-        #data["token"] = token
-        data["user"] = UsersSerializer(user_data).data
-        return data

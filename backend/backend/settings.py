@@ -156,46 +156,13 @@ REST_FRAMEWORK = {
 # }
 
 JWT_AUTH = {
-    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=30),
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=500),
     "JWT_ALLOW_REFRESH": True,
     # 3 days
-    "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(seconds=30),
+    "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(seconds=500),
     "JWT_AUTH_COOKIE": "JWT",
 }
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
-# REST_FRAMEWORK = {
-#     # 'DEFAULT_AUTHENTICATION_CLASSES': (
-#     #     'rest_framework.authentication.TokenAuthentication',
-#     # ),
-#     # 'DEFAULT_RENDERER_CLASSES': (
-#     #     'rest_framework.renderers.JSONRenderer',
-#     # ),
-#     # 'DEFAULT_PERMISSION_CLASSES': (
-#     #     'rest_framework.permissions.IsAuthenticated',
-#     # ),
-#     # 'DEFAULT_THROTTLE_RATES': {
-#     #     'anon': '100/day',
-#     #     'user': '1000/day',
-#     # },
-#     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-#     # 'PAGE_SIZE': 10,
-#     # 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-#     # 'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-#     # 'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
-#     # # 'DEFAULT_FILTER_BACKENDS': (
-#     # #     'django_filters.rest_framework.DjangoFilterBackend',
-#     # # ),
-#     # 'DEFAULT_PARSER_CLASSES': [
-#     #     'rest_framework.parsers.JSONParser',
-#     #     'rest_framework.parsers.FormParser',
-#     #     'rest_framework.parsers.MultiPartParser'
-#     # ],
-#     # 'DEFAULT_AUTHENTICATION_CLASSES': (
-#     #     'rest_framework.authentication.TokenAuthentication',
-#     # ),
-#     # 'DEFAULT_PERMISSION_CLASSES': (
-#     #     'rest_framework.permissions.IsAuthenticated',
-#     # ),
-#     'DEFAULT_TOKEN_CLASS': 'myapp.custom_token.CustomToken',
-# }
