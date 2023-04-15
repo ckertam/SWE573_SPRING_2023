@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from user.models import User,Story,Location #, Date, SpecificDate, Decade, Season
+from user.models import User,Story,Location,Comment #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
 from rest_framework.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
@@ -103,3 +103,11 @@ class StorySerializer(serializers.ModelSerializer):
         
         story = Story.objects.create(location_id=location, **validated_data)
         return story
+
+class CommentSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment_author', 'story', 'text', 'date']
+        #read_only_fields = ['id', 'comment_author', 'story', 'date']

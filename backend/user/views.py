@@ -1,11 +1,9 @@
 # views.py
 from rest_framework import generics, status, views
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework.authentication import get_authorization_header
-from .serializers import UserRegisterSerializer,StorySerializer
+from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer
 from rest_framework.exceptions import AuthenticationFailed
-from .models import User,Story
+from .models import User,Story,Comment
 from .authentication import *
 from .functions import auth_check
 import json
@@ -136,4 +134,40 @@ class StoryDetailView(views.APIView):
             return Response({'message': 'Story not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = StorySerializer(story)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class CreateCommentView(views.APIView):
+    def post(self, request, pk):
+        user_id = auth_check(request)
+        if(user_id == 'unauth'):
+            raise AuthenticationFailed('unauth')
+
+        try:
+            story = Story.objects.get(pk=pk)
+        except Story.DoesNotExist:
+            return Response({'error': 'Story does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = {
+            'comment_author': user_id,
+            'story': pk,
+            'text': request.data.get('text')
+        }
+        print(data)
+        serializer = CommentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class StoryCommentsView(views.APIView):
+    def get(self, request, pk):
+        try:
+            story = Story.objects.get(pk=pk)
+        except Story.DoesNotExist:
+            return Response({'error': 'Story does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+        comments = Comment.objects.filter(story=story).order_by('-date')
+        serializer = CommentSerializer(comments, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
