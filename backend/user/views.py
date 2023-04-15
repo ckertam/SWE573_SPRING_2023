@@ -1,7 +1,7 @@
 # views.py
 from rest_framework import status, views
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer,UsersSerializer
+from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer,UsersSerializer,UserFollowerSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from .models import User,Story,Comment
 from .authentication import *
@@ -177,11 +177,11 @@ class FollowUserView(views.APIView):
 
         if user_to_follow.followers.filter(pk=user).exists():
             user_to_follow.followers.remove(user)
-            serializer = UsersSerializer(user_to_follow)
+            #serializer = UsersSerializer(user_to_follow)
             return Response("unfollowed", status=status.HTTP_200_OK)
         else:
             user_to_follow.followers.add(user)
-            serializer = UsersSerializer(user_to_follow)
+            #serializer = UsersSerializer(user_to_follow)
 
             return Response("followed", status=status.HTTP_200_OK)
         
@@ -193,7 +193,7 @@ class UserFollowersView(views.APIView):
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
         followers = user.followers.all()
-        serializer = UsersSerializer(followers, many=True)
+        serializer = UserFollowerSerializer(followers, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK) 
 

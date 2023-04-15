@@ -44,6 +44,11 @@ class UsersSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ("id",)
 
+class UserFollowerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
 class UserLoginSerializer(serializers.ModelSerializer):
     #token = CharField(allow_blank=True, read_only=True)
     username = CharField(write_only=True, required=True)
@@ -64,39 +69,12 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = ['id', 'name', 'latitude', 'longitude']
 
-"""
-class DateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Date
-        fields = ['id', 'name']
-
-
-class SpecificDateSerializer(serializers.ModelSerializer):
-    date = serializers.DateField()
-
-    class Meta:
-        model = SpecificDate
-        fields = ['id', 'date_name', 'date']
-
-
-class DecadeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Decade
-        fields = ['id', 'date_name', 'start_year']
-
-
-class SeasonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Season
-        fields = ['id', 'date_name', 'year' , 'season_name']
-"""
-
 class StorySerializer(serializers.ModelSerializer):
-    location_id = LocationSerializer()
+    location_ids = LocationSerializer(many=True)
 
     class Meta:
         model = Story
-        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_id', 'date_type', 'season_name', 'year', 'date','creation_date']
+        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year', 'date','creation_date']
 
     def validate(self, attrs):
         date_type = attrs.get('date_type')
@@ -114,11 +92,12 @@ class StorySerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data, **kwargs):
-        location_data = validated_data.pop('location_id')
-        location = Location.objects.create(**location_data)
+        location_data = validated_data.pop('location_ids')
+        locations = [Location.objects.create(**location) for location in location_data]
 
+        story = Story.objects.create(**validated_data)
+        story.location_ids.set(locations)
         
-        story = Story.objects.create(location_id=location, **validated_data)
         return story
 
 class CommentSerializer(serializers.ModelSerializer):

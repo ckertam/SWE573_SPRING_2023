@@ -26,38 +26,7 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name    
-"""
-class Date(models.Model):
-    name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
-
-
-class SpecificDate(Date):
-    date_name = models.CharField(max_length=255, null=True)
-    date = models.DateField(null=True)
-
-    def __str__(self):
-        return f"{self.date} ({self.name})"
-
-
-class Decade(Date):
-    date_name = models.CharField(max_length=255, null=True)
-    start_year = models.IntegerField(null=True)
-
-    def __str__(self):
-        return f"{self.date} ({self.date})"
-
-
-class Season(Date):
-    date_name = models.CharField(max_length=255, null=True)
-    year = models.IntegerField(null=True)
-    season_name = models.CharField(max_length=255, null=True)
-
-    def __str__(self):
-        return f"{self.date}s ({self.date})"
-"""
 class Story(models.Model):
     SEASON = 'season'
     DECADE = 'decade'
@@ -75,7 +44,7 @@ class Story(models.Model):
     content = models.TextField(null=True)
     creation_date = models.DateTimeField(null=True,auto_now_add=True)
     story_tags = models.CharField(max_length=255, null=True)
-    location_id = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    location_ids = models.ManyToManyField(Location, blank=True)
     date_type = models.CharField(max_length=20, choices=DATE_TYPES, default=NORMAL_DATE)
     season_name = models.CharField(max_length=255, null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
@@ -91,10 +60,7 @@ class Story(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super(Story, self).save(*args, **kwargs)
-    #date_id = models.ForeignKey(Date, on_delete=models.SET_NULL, null=True)
-    #date_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
-    #date_object_id = models.PositiveIntegerField(null=True)
-    #date_object = GenericForeignKey('date_content_type', 'date_object_id')
+
 
     def __str__(self):
         return self.title
