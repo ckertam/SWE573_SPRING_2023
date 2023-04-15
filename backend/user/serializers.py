@@ -39,6 +39,8 @@ class UsersSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
+            "biography",
+            "followers"
         ]
         read_only_fields = ("id",)
 
@@ -94,7 +96,7 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_id', 'date']
+        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_id', 'date','creation_date']
 
     def create(self, validated_data, **kwargs):
         location_data = validated_data.pop('location_id')

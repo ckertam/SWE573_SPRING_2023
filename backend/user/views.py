@@ -1,7 +1,7 @@
 # views.py
 from rest_framework import generics, status, views
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer
+from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer,UsersSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from .models import User,Story,Comment
 from .authentication import *
@@ -169,5 +169,56 @@ class StoryCommentsView(views.APIView):
 
         comments = Comment.objects.filter(story=story).order_by('-date')
         serializer = CommentSerializer(comments, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class FollowUserView(views.APIView):
+    def post(self, request, pk):
+        user = auth_check(request)
+        print(user)
+
+        
+        if user == 'unauth':
+            return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user_to_follow = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        if user == user_to_follow.id:
+            return Response({'error': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user_to_follow.followers.filter(pk=user).exists():
+            user_to_follow.followers.remove(user)
+            serializer = UsersSerializer(user_to_follow)
+            return Response("unfollowed", status=status.HTTP_200_OK)
+        else:
+            user_to_follow.followers.add(user)
+            serializer = UsersSerializer(user_to_follow)
+
+            return Response("followed", status=status.HTTP_200_OK)
+        
+class UserFollowersView(views.APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+        followers = user.followers.all()
+        serializer = UsersSerializer(followers, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+
+class StoryAuthorView(views.APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+        stories = Story.objects.filter(author=user).order_by('-creation_date')
+        serializer = StorySerializer(stories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
