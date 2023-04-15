@@ -6,11 +6,16 @@ from rest_framework.exceptions import AuthenticationFailed
 from .models import User,Story,Comment
 from .authentication import *
 from .functions import auth_check
+from django.shortcuts import render
 import json
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import AllowAny
 
+#@csrf_exempt
 class UserRegistrationView(views.APIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -90,12 +95,19 @@ class LogutAPIView(views.APIView):
 class CreateStoryView(views.APIView):
     def post(self, request):
 
-        user_id = auth_check(request)
+        #user_id = auth_check(request) #when using postman
+        print(request.COOKIES)
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
         
+        print(request.body)
         request_data = json.loads(request.body)
-        request_data['author'] = user_id
+        
+        request_data['author'] = user_id 
         serializer = StorySerializer(data=request_data)
-
+        #print(request_data)
+        #print(request.body)
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -209,3 +221,4 @@ class StoryAuthorView(views.APIView):
         serializer = StorySerializer(stories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
