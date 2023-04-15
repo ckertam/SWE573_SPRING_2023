@@ -1,10 +1,9 @@
 # views.py
-from rest_framework.response import Response
 from rest_framework.authentication import get_authorization_header
-from rest_framework.exceptions import AuthenticationFailed
-from .models import User,Story
+from .models import User
 from .authentication import *
-import json
+from rest_framework.response import Response
+from rest_framework import  status
 
 def auth_check(request):
     auth = get_authorization_header(request).split()
@@ -18,4 +17,4 @@ def auth_check(request):
         #deneme = User.objects.filter(user=user).first()
         return user.id
             
-    return 'unauth'
+    return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
