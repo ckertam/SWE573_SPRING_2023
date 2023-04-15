@@ -3,10 +3,11 @@ from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import get_authorization_header
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegisterSerializer,StorySerializer
 from rest_framework.exceptions import AuthenticationFailed
-from .models import User
+from .models import User,Story
 from .authentication import *
+from .functions import auth_check
 import json
 
 class UserRegistrationView(views.APIView):
@@ -62,19 +63,12 @@ class UserLoginView(views.APIView):
 
 class AuthUserAPIView(views.APIView):
     def get(self,request):
-        auth = get_authorization_header(request).split()
-        print(auth)
 
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            id = decode_refresh_token(token)
-
-            user = User.objects.filter(pk=id).first()
-
-            #deneme = User.objects.filter(user=user).first()
-            return Response(user.id)
-        
-        raise AuthenticationFailed('unauth')
+        user_id = auth_check(request)
+        if(user_id == 'unauth'):
+            raise AuthenticationFailed('unauth')
+        else:
+            return Response(user_id)
 
 class RefreshUserAuthAPIView(views.APIView):
     def post(self,request):
@@ -95,3 +89,51 @@ class LogutAPIView(views.APIView):
             'message': 'success'
         }
         return response
+    
+
+class CreateStoryView(views.APIView):
+    def post(self, request):
+
+        user_id = auth_check(request)
+        if(user_id == 'unauth'):
+            raise AuthenticationFailed('unauth')
+        else:
+            request_data = json.loads(request.body)
+            request_data['author'] = user_id
+            serializer = StorySerializer(data=request_data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class LikeStoryView(views.APIView):
+    def post(self, request, pk):
+        user_id = auth_check(request)
+        if(user_id == 'unauth'):
+            raise AuthenticationFailed('unauth')
+        
+        else:
+            story = Story.objects.get(pk=pk)
+            # Check if the user has already liked the story
+            if user_id in story.likes.all().values_list('id', flat=True):
+                # If the user has already liked the story, remove the like
+                story.likes.remove(user_id)
+                story.save()
+                return Response({'message': 'Like removed successfully.'}, status=status.HTTP_200_OK)
+            else:
+                # If the user has not liked the story, add a new like
+                story.likes.add(user_id)
+                story.save()
+                return Response({'message': 'Like added successfully.'}, status=status.HTTP_200_OK)
+            
+class StoryDetailView(views.APIView):
+    def get(self, request, pk):
+        try:
+            story = Story.objects.get(pk=pk)
+        except Story.DoesNotExist:
+            return Response({'message': 'Story not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = StorySerializer(story)
+        return Response(serializer.data, status=status.HTTP_200_OK)
