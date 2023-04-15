@@ -96,7 +96,22 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_id', 'date','creation_date']
+        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_id', 'date_type', 'season_name', 'year', 'date','creation_date']
+
+    def validate(self, attrs):
+        date_type = attrs.get('date_type')
+        season_name = attrs.get('season_name')
+        year = attrs.get('year')
+        date = attrs.get('date')
+
+        if date_type == Story.SEASON and (year is not None or date is not None):
+            raise serializers.ValidationError("Only 'season_name' field should be set when 'date_type' is 'season'.")
+        elif date_type == Story.DECADE and (season_name is not None or date is not None):
+            raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'decade'.")
+        elif date_type == Story.NORMAL_DATE and (season_name is not None or year is not None):
+            raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
+
+        return attrs
 
     def create(self, validated_data, **kwargs):
         location_data = validated_data.pop('location_id')

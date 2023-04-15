@@ -1,8 +1,7 @@
 # models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group,Permission
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name="e-mail", max_length = 100, unique = True)
@@ -60,16 +59,38 @@ class Season(Date):
         return f"{self.date}s ({self.date})"
 """
 class Story(models.Model):
+    SEASON = 'season'
+    DECADE = 'decade'
+    NORMAL_DATE = 'normal_date'
+    
+    DATE_TYPES = [
+        (SEASON, 'Season'),
+        (DECADE, 'Decade'),
+        (NORMAL_DATE, 'Normal Date'),
+    ]
+
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, null=True)
     content = models.TextField(null=True)
     creation_date = models.DateTimeField(null=True,auto_now_add=True)
     story_tags = models.CharField(max_length=255, null=True)
     location_id = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    date = models.DateField(null=True)
+    date_type = models.CharField(max_length=20, choices=DATE_TYPES, default=NORMAL_DATE)
+    season_name = models.CharField(max_length=255, null=True, blank=True)
+    year = models.PositiveIntegerField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='liked_stories', blank=True)
     
-    
+    def clean(self):
+        # Custom validation to ensure only one date field is set
+        date_fields = [self.season_name, self.year, self.date]
+        if date_fields.count(None) != 2:
+            raise ValidationError("Only one type of date field should be set.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(Story, self).save(*args, **kwargs)
     #date_id = models.ForeignKey(Date, on_delete=models.SET_NULL, null=True)
     #date_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
     #date_object_id = models.PositiveIntegerField(null=True)
