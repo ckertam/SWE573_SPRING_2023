@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function CreateStory() {
@@ -23,6 +23,12 @@ function CreateStory() {
     });
     setLocations(locationData);
   };
+
+  useEffect(() => {
+    setSeasonName(null);
+    setYear(null);
+    setDate(null);
+  }, [date_type]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

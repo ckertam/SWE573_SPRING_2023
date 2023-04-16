@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,6 +15,7 @@ function Login() {
     },{ withCredentials: true }).then(response => {
       console.log(response.data);
       // TODO: handle success response
+      navigate('/create-story');
     }).catch(error => {
       console.log(error.response.data);
       // TODO: handle error response
