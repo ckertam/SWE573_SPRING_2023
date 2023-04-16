@@ -4,6 +4,7 @@ from .models import User
 from .authentication import *
 from rest_framework.response import Response
 from rest_framework import  status
+import codecs
 
 def auth_check(request):
     auth = get_authorization_header(request).split()
@@ -18,3 +19,7 @@ def auth_check(request):
         return user.id
             
     return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+def decode_location_name(location):
+    location['name'] = codecs.decode(location['name'], 'unicode_escape')
+    return location

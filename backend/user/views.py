@@ -102,9 +102,11 @@ class CreateStoryView(views.APIView):
         
         print(request.body)
         request_data = json.loads(request.body)
+        print(request_data)
         
         request_data['author'] = user_id 
         serializer = StorySerializer(data=request_data)
+        #print(serializer.data)
         #print(request_data)
         #print(request.body)
         

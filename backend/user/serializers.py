@@ -2,9 +2,8 @@
 from rest_framework import serializers
 from user.models import User,Story,Location,Comment #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
-from rest_framework.exceptions import ValidationError
-from django.contrib.contenttypes.models import ContentType
-
+from .functions import *
+import urllib.parse
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -92,8 +91,14 @@ class StorySerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data, **kwargs):
+        #location_data = validated_data.pop('location_ids')
+        #locations = [Location.objects.create(**location) for location in location_data]
+
         location_data = validated_data.pop('location_ids')
-        locations = [Location.objects.create(**location) for location in location_data]
+        for location in location_data:
+            # Encode the location name using URL encoding
+            location['name'] = urllib.parse.quote(location['name'], safe='')
+            locations = [Location.objects.create(**location) for location in location_data]
 
         story = Story.objects.create(**validated_data)
         story.location_ids.set(locations)
