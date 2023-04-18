@@ -82,15 +82,15 @@ class RefreshUserAuthAPIView(views.APIView):
             'token': access_token
         })
 
-class LogutAPIView(views.APIView):
-    def post(self, _):
+class LogoutAPIView(views.APIView):
+    def post(self, request):
+
         response = Response()
-        response.delete_cookie(key="refreshToken")
+        response.delete_cookie('refreshToken')
         response.data = {
             'message': 'success'
         }
         return response
-    
 
 class CreateStoryView(views.APIView):
     def post(self, request):
@@ -200,7 +200,11 @@ class FollowUserView(views.APIView):
             return Response("followed", status=status.HTTP_200_OK)
         
 class UserFollowersView(views.APIView):
-    def get(self, request, user_id):
+    def get(self, request):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -213,14 +217,32 @@ class UserFollowersView(views.APIView):
 
 
 class StoryAuthorView(views.APIView):
-    def get(self, request, user_id):
+    def get(self, request):
+
+        print(request.COOKIES)
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        #user_id = auth_check(request)
+        print(user_id)
+
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
-        stories = Story.objects.filter(author=user).order_by('-creation_date')
+        followed_users = user.following.all()
+        followed_users_ids = followed_users.values_list('id', flat=True)
+
+        stories = Story.objects.filter(author__in=followed_users_ids).order_by('-creation_date')
         serializer = StorySerializer(stories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
+class UsernamesByIDsView(views.APIView):
+    def get(self, request):
+
+        user_ids = request.GET.getlist('user_ids[]')
+        usernames = User.objects.filter(id__in=user_ids).values_list('username', flat=True)
+        return Response(list(usernames))

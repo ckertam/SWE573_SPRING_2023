@@ -16,7 +16,7 @@ function Login() {
     },{ withCredentials: true }).then(response => {
       console.log(response.data);
       // TODO: handle success response
-      navigate('/create-story');
+      navigate('/homepage');
     }).catch(error => {
       console.log(error.response.data);
       // TODO: handle error response
