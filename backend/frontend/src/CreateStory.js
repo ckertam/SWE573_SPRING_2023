@@ -27,6 +27,7 @@ function CreateStory() {
       longitude: Number(place.geometry.location.lng().toFixed(6)),
     };
     setLocations([...location_ids, locationData]);
+    setMapCenter({ lat: locationData.latitude, lng: locationData.longitude});
   };
 
   useEffect(() => {
@@ -51,6 +52,8 @@ function CreateStory() {
           longitude: Number(lng.toFixed(6))
         };
         setLocations([...location_ids, locationData]);
+
+        setMapCenter({ lat: locationData.latitude, lng: locationData.longitude});
       }
     } catch (error) {
       console.log(error);
@@ -193,7 +196,6 @@ function CreateStory() {
         key={index}
         position={{ lat: loc.latitude, lng: loc.longitude }}
         onClick={() => {
-          // handle marker click here
         }}
       />
     ))}
