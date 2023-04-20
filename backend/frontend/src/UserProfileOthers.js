@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 
 const UserProfileOthers = () => {
@@ -8,7 +8,15 @@ const UserProfileOthers = () => {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   const getCurrentUser = async () => {
     try {
@@ -56,6 +64,7 @@ const UserProfileOthers = () => {
         setIsFollowing(isCurrentUserFollowing);
 
         setFollowerCount(userDetailsResponse.data.followers.length);
+
       } catch (error) {
         console.error('Error fetching user details and profile photo:', error);
       }
@@ -63,6 +72,10 @@ const UserProfileOthers = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchUserStories();
+  }, [currentPage]);
 
   const handleFollowClick = async () => {
     try {
@@ -79,6 +92,32 @@ const UserProfileOthers = () => {
       }
     } catch (error) {
       console.error('Error following/unfollowing user:', error);
+    }
+  };
+
+  const fetchUserStories = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/user/userStories/${id}?page=${currentPage}&size=5`, {
+        withCredentials: true,
+      });
+      setStories(response.data.stories);
+      setHasNextPage(response.data.has_next);
+      setHasPrevPage(response.data.has_prev);
+      setTotalPages(response.data.total_pages);
+    } catch (error) {
+      console.error('Error fetching user stories:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStoryClick = async (id) => {
+    navigate(`/story/${id}`);
+  }
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
   };
 
@@ -103,6 +142,38 @@ const UserProfileOthers = () => {
       <button onClick={handleFollowClick}>
         {isFollowing ? 'Unfollow' : 'Follow'}
       </button>
+      <h2>Stories</h2>
+      {loading ? (
+        <p>Loading stories...</p>
+      ) : stories.length === 0 ? (
+        <p>No stories found.</p>
+      ) : (
+        <div>
+          {stories.map(story => (
+            <div key={story.id}>
+              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+              <p>Creation Date: {new Date(story.creation_date).toLocaleString()}</p>
+            </div>
+          ))}
+          <div className="pagination">
+            <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                className={index + 1 === currentPage ? 'active' : null}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

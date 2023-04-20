@@ -247,19 +247,16 @@ class UserFollowersView(views.APIView):
 
 
 class StoryAuthorView(views.APIView):
-    def get(self, request):
+    def get(self, request, user_id=None):
 
         print(request.COOKIES)
 
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
-        #user_id = auth_check(request)
-        print(user_id)
-
-        try:
-            user = User.objects.get(id=user_id) 
-        except User.DoesNotExist:
-            return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        if user_id:
+            user = get_object_or_404(User, pk=user_id)
+        else:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            user = get_object_or_404(User, pk=user_id)
 
         followed_users_ids = user.following.values_list('id', flat=True)
         #print(followed_users)

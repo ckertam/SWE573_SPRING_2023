@@ -17,6 +17,7 @@ urlpatterns = [
     path('userFollowers',UserFollowersView.as_view()),
     path('userFollowers/<int:user_id>',UserFollowersView.as_view()),
     path('userStories',StoryAuthorView.as_view()),
+    path('userStories/<int:user_id>',StoryAuthorView.as_view()),
     path('usernamesbyId',UsernamesByIDsView.as_view()),
     path('biography',UserBiographyView.as_view()),
     path('userDetails',UserDetailsView.as_view()),
