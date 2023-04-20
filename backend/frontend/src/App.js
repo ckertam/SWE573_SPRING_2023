@@ -1,13 +1,14 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import Register from './Register';
 import Login from './Login';
 import CreateStory from './CreateStory';
-import StoriesByFollowingsUsers from './StoriesbyFollowers';
+import StoriesByFollowingsUsers from './StoriesbyFollowingUsers';
 import StoryDetails from './StoryDetails';
 import LogoutButton from './Logout';
-
+import UserProfile from './UserProfile';
+import UserProfileOthers from './UserProfileOthers';
 
 function App() {
   
@@ -21,6 +22,7 @@ function App() {
             <Link to="/login" className="nav-item nav-link">Login</Link>
             <Link to="/homepage" className="nav-item nav-link">Home Page</Link>
             <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
+            <Link to="/user-profile" className="nav-item nav-link">User Profile</Link> {/* New link */}
           </div>
         </nav>
         <LogoutButton />
@@ -31,6 +33,8 @@ function App() {
           <Route path="/homepage" element={<StoriesByFollowingsUsers />} />
           <Route path="/create-story" element={<CreateStory />} />
           <Route path="/story/:id" element={<StoryDetails />} />
+          <Route path="/user-profile" element={<UserProfile />} />
+          <Route path="/user-profile/:id" element={<UserProfileOthers />} />
         </Routes>
       </div>
     </Router>

@@ -1,0 +1,11 @@
+.author {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .author:active {
+    transform: scale(0.95);
+  }
+  

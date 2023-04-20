@@ -1,15 +1,16 @@
 # views.py
-from rest_framework import status, views
+from rest_framework import status, views, generics
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer,StorySerializer,CommentSerializer,UsersSerializer,UserFollowerSerializer
-from rest_framework.exceptions import AuthenticationFailed
+from .serializers import *
 from .models import User,Story,Comment
 from .authentication import *
 from .functions import auth_check
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 import json
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny
+from django.http import HttpResponse
+import os
+
 
 #@csrf_exempt
 class UserRegistrationView(views.APIView):
@@ -181,7 +182,6 @@ class FollowUserView(views.APIView):
     def post(self, request, pk):
         user = auth_check(request)
         print(user)
-
         try:
             user_to_follow = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -227,12 +227,13 @@ class StoryAuthorView(views.APIView):
         print(user_id)
 
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=user_id) 
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
-        followed_users = user.following.all()
-        followed_users_ids = followed_users.values_list('id', flat=True)
+        followed_users_ids = user.following.values_list('id', flat=True)
+        #print(followed_users)
+        #followed_users_ids = followed_users.values_list('id', flat=True)
 
         stories = Story.objects.filter(author__in=followed_users_ids).order_by('-creation_date')
         serializer = StorySerializer(stories, many=True)
@@ -246,3 +247,75 @@ class UsernamesByIDsView(views.APIView):
         user_ids = request.GET.getlist('user_ids[]')
         usernames = User.objects.filter(id__in=user_ids).values_list('username', flat=True)
         return Response(list(usernames))
+
+class UserDetailsView(views.APIView):
+        
+    def get(self, request, user_id=None):
+
+        #user_id = auth_check(request)
+        if user_id:
+            user = get_object_or_404(User, pk=user_id)
+        else:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            user = get_object_or_404(User, pk=user_id)
+
+        serializer = UsersSerializer(user)
+        return Response(serializer.data)
+
+class UserBiographyView(views.APIView):
+
+    def get(self, request):
+        user_id = auth_check(request)
+
+        user = get_object_or_404(User, pk=user_id)
+
+        serializer = UserBiographySerializer(user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        
+        user_id = auth_check(request)
+
+        user = get_object_or_404(User, pk=user_id)
+
+        serializer = UserBiographySerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserPhotoView(views.APIView):
+
+    def get(self, request, user_id=None):
+        
+        #user_id = auth_check(request)
+        if user_id:
+            user = get_object_or_404(User, pk=user_id)
+        else:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            user = get_object_or_404(User, pk=user_id)
+
+        serializer = UserPhotoSerializer(user)
+
+        file_ext = os.path.splitext(user.profile_photo.name)[-1].lower()
+        content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
+
+        # Serve the image file with the proper content type and inline attachment
+        response = HttpResponse(user.profile_photo, content_type=content_type)
+        response['Content-Disposition'] = f'inline; filename="{user.profile_photo.name}"'
+
+        return response
+
+    def put(self, request):
+        
+        user_id = auth_check(request)
+
+        user = get_object_or_404(User, pk=user_id)
+
+        serializer = UserPhotoSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

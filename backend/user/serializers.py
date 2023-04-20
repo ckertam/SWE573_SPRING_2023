@@ -39,7 +39,8 @@ class UsersSerializer(serializers.ModelSerializer):
             "username",
             "email",
             "biography",
-            "followers"
+            "followers",
+            "profile_photo"
         ]
         read_only_fields = ("id",)
 
@@ -112,3 +113,23 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'comment_author', 'story', 'text', 'date']
         #read_only_fields = ['id', 'comment_author', 'story', 'date']
+
+class UserBiographySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['biography']
+
+    def update(self, instance, validated_data):
+        instance.biography = validated_data.get('biography', instance.biography)
+        instance.save()
+        return instance
+
+class UserPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_photo']
+    
+    def update(self, instance, validated_data):
+        instance.profile_photo = validated_data.get('profile_photo', instance.profile_photo)
+        instance.save()
+        return instance

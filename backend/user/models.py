@@ -9,16 +9,9 @@ class User(AbstractUser):
     creation_date = models.DateTimeField(auto_now_add=True)
     password_again = models.CharField(max_length=128, verbose_name='password_again',null=True)
     biography = models.TextField(blank=True)
-    #profile_photo = models.ImageField(upload_to='profile_photos/', blank=True)
+    profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
     followers = models.ManyToManyField('self', related_name='following', symmetrical=False, blank=True)
-    #is_admin = models.BooleanField(default=False)
-    #is_active = models.BooleanField(default=True)
-    #is_expert = models.BooleanField(default=False)
-    #profile_image = models.CharField(max_length=9000000, null=True, blank=True)
 
-
-    #USERNAME_FIELD = "email"
-    #REQUIRED_FIELDS = [] 
 class Location(models.Model):
     name = models.CharField(max_length=255)
     latitude = models.DecimalField(max_digits=19, decimal_places=10)
@@ -31,11 +24,13 @@ class Story(models.Model):
     SEASON = 'season'
     DECADE = 'decade'
     NORMAL_DATE = 'normal_date'
+    INTERVAL_DATE = 'interval_date'
     
     DATE_TYPES = [
         (SEASON, 'Season'),
         (DECADE, 'Decade'),
         (NORMAL_DATE, 'Normal Date'),
+        (INTERVAL_DATE, 'Interval Date'),
     ]
 
 
