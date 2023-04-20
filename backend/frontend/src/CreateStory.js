@@ -12,6 +12,8 @@ function CreateStory() {
   const [season_name, setSeasonName] = useState(null);
   const [year, setYear] = useState(null);
   const [date, setDate] = useState(null);
+  const [start_date, setStartDate] = useState(null);
+  const [end_date, setEndDate] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
 
@@ -27,23 +29,12 @@ function CreateStory() {
     setLocations([...location_ids, locationData]);
   };
 
-  const handleLocationChange = (e) => {
-    const locationData = e.target.value.split(';').map(loc => {
-      const json = loc.trim().replace(/^{/, '').replace(/}$/, '');
-      const {name, latitude, longitude} = JSON.parse(`{${json}}`);
-      return {
-        name: name,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude)
-      };
-    });
-    setLocations(locationData);
-  };
-
   useEffect(() => {
     setSeasonName(null);
     setYear(null);
     setDate(null);
+    setStartDate(null);
+    setEndDate(null);
   }, [date_type]);
 
   const handleMapClick = async (e) => {
@@ -97,7 +88,9 @@ function CreateStory() {
         date_type: date_type,
         season_name: season_name,
         year: year,
-        date: date
+        date: date,
+        start_date : start_date,
+        end_date: end_date
       }, { withCredentials: true });
       window.location.reload();
       console.log(response.data);
@@ -147,6 +140,7 @@ function CreateStory() {
         <option value="season">Season</option>
         <option value="decade">Decade</option>
         <option value="normal_date">Normal Date</option>
+        <option value="interval_date">Interval Date</option>
       </select>
     </div>
     {date_type === 'season' &&
@@ -165,6 +159,14 @@ function CreateStory() {
       <div className="form-group">
         <label>Date:</label>
         <input type="date" className="form-control" onChange={(e) => setDate(e.target.value)} />
+      </div>
+    }
+    {date_type === 'interval_date' &&
+      <div className="form-group">
+        <label>Start Date:</label>
+        <input type="date" className="form-control" onChange={(e) => setStartDate(e.target.value)} />
+        <label>End Date:</label>
+        <input type="date" className="form-control" onChange={(e) => setEndDate(e.target.value)} />
       </div>
     }
     <button type="submit" className="btn btn-primary">Create Story</button>

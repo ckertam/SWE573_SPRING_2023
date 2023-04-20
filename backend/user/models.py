@@ -44,12 +44,16 @@ class Story(models.Model):
     season_name = models.CharField(max_length=255, null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date =models.DateField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='liked_stories', blank=True)
     
     def clean(self):
         # Custom validation to ensure only one date field is set
-        date_fields = [self.season_name, self.year, self.date]
-        if date_fields.count(None) != 2:
+
+        date_fields = [self.season_name, self.year, self.date, self.end_date]
+        print(date_fields)
+        if date_fields.count(None) != 3:
             raise ValidationError("Only one type of date field should be set.")
 
     def save(self, *args, **kwargs):
