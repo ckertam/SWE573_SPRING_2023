@@ -111,12 +111,19 @@ class StorySerializer(serializers.ModelSerializer):
         return story
 
 class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment_author', 'story', 'text', 'date']
 
+class CommentGetSerializer(serializers.ModelSerializer):
+    comment_author = serializers.SerializerMethodField()
+
+    def get_comment_author(self, obj):
+        return obj.comment_author.username
 
     class Meta:
         model = Comment
         fields = ['id', 'comment_author', 'story', 'text', 'date']
-        #read_only_fields = ['id', 'comment_author', 'story', 'date']
 
 class UserBiographySerializer(serializers.ModelSerializer):
     class Meta:
