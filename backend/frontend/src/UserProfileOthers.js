@@ -7,7 +7,7 @@ const UserProfileOthers = () => {
   const [user, setUser] = useState(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [followerCount, setFollowerCount] = useState(0);
+  const [followerCount, setFollowerCount] = useState(null);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,39 +39,56 @@ const UserProfileOthers = () => {
           withCredentials: true,
         });
         setUser(userDetailsResponse.data);
+        console.log('User details response:', userDetailsResponse.data);
 
-        const profilePhotoResponse = await axios.get(`http://localhost:8000/user/profilePhoto/${id}`, {
-          headers: {},
-          withCredentials: true,
-          responseType: 'arraybuffer',
-        });
-        const base64Image = Buffer.from(profilePhotoResponse.data, 'binary').toString('base64');
-
-        const contentType = profilePhotoResponse.headers['content-type'];
-        const dataUrlPrefix = contentType === 'image/jpeg' ? 'data:image/jpeg;base64,' : 'data:image/png;base64,';
-
-        setProfilePhotoUrl(`${dataUrlPrefix}${base64Image}`);
+        try {
+          const profilePhotoResponse = await axios.get(`http://localhost:8000/user/profilePhoto/${id}`, {
+            headers: {},
+            withCredentials: true,
+            responseType: 'arraybuffer',
+          });
+          const base64Image = Buffer.from(profilePhotoResponse.data, 'binary').toString('base64');
+      
+          const contentType = profilePhotoResponse.headers['content-type'];
+          const dataUrlPrefix = contentType === 'image/jpeg' ? 'data:image/jpeg;base64,' : 'data:image/png;base64,';
+      
+          setProfilePhotoUrl(`${dataUrlPrefix}${base64Image}`);
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            // Profile photo not found, do nothing
+          } else {
+            console.error('Error fetching profile photo:', error);
+          }
+        }
         
         const followersResponse = await axios.get(`http://localhost:8000/user/userFollowers/${id}`, {
         headers: {},
         withCredentials: true,
         });
+        console.log('Followers response:', followersResponse.data);
         const currentUser = await getCurrentUser();
-
+        
+        console.log(followersResponse.data)
         const isCurrentUserFollowing = followersResponse.data.some(
             (follower) => follower.id === currentUser
         );
         setIsFollowing(isCurrentUserFollowing);
-
-        setFollowerCount(userDetailsResponse.data.followers.length);
-
+        
+        
+        setFollowerCount(followersResponse.data.length);
+        setLoading(false); 
+        
+        
       } catch (error) {
         console.error('Error fetching user details and profile photo:', error);
+      } finally {
+        setLoading(false); 
       }
     };
+    
 
     fetchData();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     fetchUserStories();
@@ -138,7 +155,7 @@ const UserProfileOthers = () => {
       {/* <p>ID: {user.id}</p>
       <p>Email: {user.email}</p> */}
       <p>Biography: {user.biography}</p>
-      <p>Followers: {followerCount}</p>
+      <p>Followers: {followerCount !== null ? followerCount : 'Loading...'}</p>
       <button onClick={handleFollowClick}>
         {isFollowing ? 'Unfollow' : 'Follow'}
       </button>
