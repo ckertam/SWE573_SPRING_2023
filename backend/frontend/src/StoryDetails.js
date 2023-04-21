@@ -152,9 +152,11 @@ function StoryDetails() {
                 ))}
           </div>
           <div className={styles.pagination}>
-            <button onClick={() => handlePhotoPageChange(currentPhotoPage - 1)} disabled={!hasPrevPhotoPage}>
-              Previous
-            </button>
+          {hasPrevPhotoPage && (
+              <button onClick={() => handlePhotoPageChange(currentPhotoPage - 1)} disabled={!hasPrevPhotoPage}>
+                Previous
+              </button>
+            )}
             {Array.from({ length: totalPhotoPages }, (_, index) => (
               <button
                 key={index}
@@ -164,13 +166,15 @@ function StoryDetails() {
                 {index + 1}
               </button>
             ))}
-            <button onClick={() => handlePhotoPageChange(currentPhotoPage + 1)} disabled={!hasNextPhotoPage}>
-              Next
-            </button>
+            {hasNextPhotoPage && (
+              <button onClick={() => handlePhotoPageChange(currentPhotoPage + 1)} disabled={!hasNextPhotoPage}>
+                Next
+              </button>
+            )}
           </div>
           {story.location_ids.length > 0 && (
             <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-              <GoogleMap
+            <GoogleMap
               mapContainerStyle={{ height: '400px', width: '100%' }}
               zoom={12}
               center={{
@@ -178,17 +182,20 @@ function StoryDetails() {
                 lng: parseFloat(story.location_ids[0].longitude),
               }}
             >
-            {story.location_ids.map((location, index) => (
-              <Marker
-                key={index}
-                position={{
-                  lat: parseFloat(location.latitude),
-                  lng: parseFloat(location.longitude),
-                }}
-              />
-            ))}
+              {story.location_ids.map((location, index) => {
+                console.log('Location:', location); // Add this line
+                return (
+                  <Marker
+                    key={index}
+                    position={{
+                      lat: parseFloat(location.latitude),
+                      lng: parseFloat(location.longitude),
+                    }}
+                  />
+                );
+              })}
             </GoogleMap>
-            </LoadScriptNext>
+          </LoadScriptNext>
           )}
           <h2>Comments</h2>
           {comments &&
@@ -199,9 +206,11 @@ function StoryDetails() {
               </div>
             ))}
           <div className={styles.pagination}>
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-              Previous
-            </button>
+          {hasPrevPage && (
+              <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+                Previous
+              </button>
+            )}
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index}
@@ -211,9 +220,11 @@ function StoryDetails() {
                 {index + 1}
               </button>
             ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-              Next
-            </button>
+            {hasNextPage && (
+              <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+                Next
+              </button>
+            )}
           </div>
         </>
       ) : (
