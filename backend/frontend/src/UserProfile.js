@@ -79,6 +79,37 @@ const UserProfile = () => {
     }
   };
 
+  const handleProfilePhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+  
+    try {
+      await axios.put('http://localhost:8000/user/profilePhoto', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      fetchProfilePhoto();
+    } catch (error) {
+      console.error('Error updating profile photo:', error);
+    }
+  };
+
+  const handleRemoveProfilePhoto = async () => {
+    try {
+      await axios.delete('http://localhost:8000/user/profilePhoto', {
+        withCredentials: true,
+      });
+      setProfilePhotoUrl(null);
+    } catch (error) {
+      console.error('Error removing profile photo:', error);
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -90,9 +121,34 @@ const UserProfile = () => {
         <img
           src={profilePhotoUrl}
           alt={`${user.username}'s profile`}
-          className="profile-photo" 
+          className="profile-photo"
         />
       )}
+      <div>
+        <button
+          type="button"
+          className="profile-photo-button"
+          onClick={() => document.getElementById('profile-photo-input').click()}
+        >
+          Upload Profile Photo
+        </button>
+        <span id="profile-photo-filename"></span>
+        <input
+          id="profile-photo-input"
+          type="file"
+          accept="image/jpeg, image/png"
+          onChange={handleProfilePhotoChange}
+        />
+      </div>
+      <div>
+        <button 
+        type="button"
+        className="profile-photo-delete-button"
+        onClick={handleRemoveProfilePhoto}>
+        Remove Profile Photo
+        </button>
+      </div>
+      
       <p>Biography: {user.biography}</p>
       <p>Followers: {user.followers.length}</p>
 

@@ -45,3 +45,49 @@
   background-color: #4caf50;
   color: white;
 }
+
+input[type="file"] {
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.profile-photo-button {
+  display: inline-block;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.profile-photo-button:hover {
+  background-color: #3e8e41;
+}
+
+.profile-photo-button:focus {
+  outline: none;
+}
+
+.profile-photo-delete-button {
+  display: inline-block;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #ff5100;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.profile-photo-delete-button:hover {
+  background-color: #b33f09;
+}
+
+.profile-photo-delete-button:focus {
+  outline: none;
+}

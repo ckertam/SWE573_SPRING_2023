@@ -11,10 +11,11 @@ from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
 import os
 from django.core.paginator import Paginator
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import FileSystemStorage
 from math import ceil
 
 
-#@csrf_exempt
 class UserRegistrationView(views.APIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
@@ -354,12 +355,32 @@ class UserPhotoView(views.APIView):
 
     def put(self, request):
         
-        user_id = auth_check(request)
-
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
         user = get_object_or_404(User, pk=user_id)
 
-        serializer = UserPhotoSerializer(user, data=request.data)
+        if not isinstance(request.FILES.get('profile_photo'), InMemoryUploadedFile):
+            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserPhotoSerializer(user, data={'profile_photo': request.FILES['profile_photo']})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        user = get_object_or_404(User, pk=user_id)
+
+        if user.profile_photo:
+            # Create a FileSystemStorage object to interact with the file system
+            storage = FileSystemStorage()
+            # Delete the file from the storage
+            storage.delete(user.profile_photo.name)
+            # Update the user model to remove the profile photo
+            user.profile_photo = None
+            user.save()
+            return Response({'success': 'Profile photo deleted'})
+        else:
+            return Response({'error': 'Profile photo does not exist'})
