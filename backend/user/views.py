@@ -8,12 +8,14 @@ from .functions import auth_check
 from django.shortcuts import get_object_or_404
 import json
 from rest_framework.permissions import AllowAny
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 import os
 from django.core.paginator import Paginator
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from math import ceil
+from rest_framework.exceptions import PermissionDenied
+import base64
 
 
 class UserRegistrationView(views.APIView):
@@ -121,6 +123,52 @@ class CreateStoryView(views.APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class AddStoryPhotoView(views.APIView):
+
+    def post(self, request, story_id, format=None):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        story = Story.objects.get(pk=story_id)
+
+        print(story.author.id)
+        print(user_id)
+        if story.author.id != user_id:
+            raise PermissionDenied()
+        
+        serializer = StoryPhotoSerializer(data=request.data)
+
+        if serializer.is_valid():
+            photo_for_story = serializer.save()
+            story.stories_photo.add(photo_for_story)
+            story.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, story_id, photo_id, format=None):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        story = get_object_or_404(Story, pk=story_id)
+
+        print(story.author.id)
+        print(user_id)
+        if story.author.id != user_id:
+            raise PermissionDenied()
+
+        # check if the photo exists for the story
+        photo_for_story = get_object_or_404(PhotoForStory, pk=photo_id, story=story)
+
+        photo_for_story.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     
 
 class LikeStoryView(views.APIView):
@@ -140,7 +188,7 @@ class LikeStoryView(views.APIView):
             story.save()
             return Response({'message': 'Like added successfully.'}, status=status.HTTP_200_OK)
             
-class StoryDetailView(views.APIView):
+class StoryDetailView(views.APIView): ##need to add auth here?
     def get(self, request, pk):
         try:
             story = Story.objects.get(pk=pk)
@@ -244,6 +292,9 @@ class UserFollowersView(views.APIView):
         followers = user.followers.all()
         serializer = UserFollowerSerializer(followers, many=True)
 
+        print("caner")
+        print(serializer.data)
+
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
 
@@ -336,6 +387,30 @@ class UserBiographyView(views.APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class StoryPhotosView(views.APIView):
+    def get(self, request, story_id, format=None):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        story = Story.objects.get(pk=story_id)
+        photos = story.stories_photo.all()
+
+        response_data = []
+        for photo in photos:
+            file_ext = os.path.splitext(photo.photo_for_story.name)[-1].lower()
+            content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
+            data_url_prefix = 'data:' + content_type + ';base64,'
+
+            with photo.photo_for_story.open('rb') as image_file:
+                base64_encoded_data = base64.b64encode(image_file.read()).decode('utf-8')
+                response_data.append({
+                    'id': photo.id,
+                    'photo_for_story': data_url_prefix + base64_encoded_data
+                })
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 class UserPhotoView(views.APIView):
 
     def get(self, request, user_id=None):
@@ -349,10 +424,11 @@ class UserPhotoView(views.APIView):
             user = get_object_or_404(User, pk=user_id)
 
         serializer = UserPhotoSerializer(user)
-
         file_ext = os.path.splitext(user.profile_photo.name)[-1].lower()
-        content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
+        print(user.profile_photo)
+        
 
+        content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
         # Serve the image file with the proper content type and inline attachment
         response = HttpResponse(user.profile_photo, content_type=content_type)
         response['Content-Disposition'] = f'inline; filename="{user.profile_photo.name}"'
@@ -364,7 +440,6 @@ class UserPhotoView(views.APIView):
         cookie_value = request.COOKIES['refreshToken']
         user_id = decode_refresh_token(cookie_value)
         user = get_object_or_404(User, pk=user_id)
-
         if not isinstance(request.FILES.get('profile_photo'), InMemoryUploadedFile):
             return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -390,3 +465,19 @@ class UserPhotoView(views.APIView):
             return Response({'success': 'Profile photo deleted'})
         else:
             return Response({'error': 'Profile photo does not exist'})
+
+
+class StoryPhotoAPIView(views.APIView):
+    serializer_class = PhotoForStorySerializer
+
+    def get(self, request, story_id, format=None):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        try:
+            story = Story.objects.get(pk=story_id)
+            photos = story.stories_photo.all()
+            serializer = self.serializer_class(photos, many=True)
+            return Response(serializer.data)
+        except Story.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams,useNavigate,useLocation  } from 'react-router-dom';
+import { useParams,useNavigate  } from 'react-router-dom';
 import styles from './StoryDetails.module.css';
 import { GoogleMap, LoadScriptNext, Marker } from '@react-google-maps/api';
 
@@ -17,6 +17,9 @@ function StoryDetails() {
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [photos, setPhotos] = useState([]);
+
+
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -32,6 +35,18 @@ function StoryDetails() {
     };
     fetchStory();
   }, []);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}`, { withCredentials: true });
+        setPhotos(response.data.map(item => item.photo_for_story));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchPhotos();
+  }, [id]);
 
   const fetchComments = async (page) => {
     try {
@@ -108,7 +123,18 @@ function StoryDetails() {
           <p>{`Time: ${formatDate()}`}</p>
           <p>{`content: ${story.content}`}</p>
           <p>{`tags: ${story.story_tags}`}</p>
-
+          <div>
+            {photos &&
+              photos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={photo}
+                  alt={`story photo ${index}`}
+                  width={100}
+                  height={100}
+                />
+              ))}
+          </div>
           {story.location_ids.length > 0 && (
             <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
               <GoogleMap

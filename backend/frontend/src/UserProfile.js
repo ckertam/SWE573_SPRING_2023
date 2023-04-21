@@ -47,14 +47,16 @@ const UserProfile = () => {
         responseType: 'arraybuffer',
       });
       const base64Image = Buffer.from(response.data, 'binary').toString('base64');
-  
+      
       const contentType = response.headers['content-type'];
       const dataUrlPrefix = contentType === 'image/jpeg' ? 'data:image/jpeg;base64,' : 'data:image/png;base64,';
-  
+      
       setProfilePhotoUrl(`${dataUrlPrefix}${base64Image}`);
+
     } catch (error) {
       console.error('Error fetching profile photo:', error);
     }
+    
   };
 
   const fetchUserStories = async () => {

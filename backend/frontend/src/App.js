@@ -9,6 +9,7 @@ import StoryDetails from './StoryDetails';
 import LogoutButton from './Logout';
 import UserProfile from './UserProfile';
 import UserProfileOthers from './UserProfileOthers';
+import AddPhotoToStory from './AddPhotoToStory';
 
 function App() {
   
@@ -32,6 +33,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/homepage" element={<StoriesByFollowingsUsers />} />
           <Route path="/create-story" element={<CreateStory />} />
+          <Route path="/create-story/add-photo/:story_id/:story_title" element={<AddPhotoToStory />} />
           <Route path="/story/:id" element={<StoryDetails />} />
           <Route path="/user-profile" element={<UserProfile />} />
           <Route path="/user-profile/:id" element={<UserProfileOthers />} />

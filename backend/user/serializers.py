@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from user.models import User,Story,Location,Comment #, Date, SpecificDate, Decade, Season
+from user.models import User,Story,Location,Comment,PhotoForStory #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
 from .functions import *
 import urllib.parse
@@ -63,6 +63,25 @@ class UserLoginSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {"password": {"write_only": True, "required": False}}
 
+class UserBiographySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['biography']
+
+    def update(self, instance, validated_data):
+        instance.biography = validated_data.get('biography', instance.biography)
+        instance.save()
+        return instance
+
+class UserPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_photo']
+    
+    def update(self, instance, validated_data):
+        instance.profile_photo = validated_data.get('profile_photo', instance.profile_photo)
+        instance.save()
+        return instance
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -110,6 +129,18 @@ class StorySerializer(serializers.ModelSerializer):
         
         return story
 
+class StoryPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhotoForStory
+        fields = ('id', 'photo_for_story')
+
+class PhotoForStorySerializer(serializers.ModelSerializer):
+    story_id = serializers.ReadOnlyField(source='story.id')
+
+    class Meta:
+        model = PhotoForStory
+        fields = ('id', 'photo_for_story', 'story_id')
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
@@ -125,22 +156,3 @@ class CommentGetSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'comment_author', 'story', 'text', 'date']
 
-class UserBiographySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['biography']
-
-    def update(self, instance, validated_data):
-        instance.biography = validated_data.get('biography', instance.biography)
-        instance.save()
-        return instance
-
-class UserPhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['profile_photo']
-    
-    def update(self, instance, validated_data):
-        instance.profile_photo = validated_data.get('profile_photo', instance.profile_photo)
-        instance.save()
-        return instance

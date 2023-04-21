@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 
 function CreateStory() {
@@ -16,6 +17,9 @@ function CreateStory() {
   const [end_date, setEndDate] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
+
+  const navigate = useNavigate();
+
 
   const autocompleteRef = useRef(null);
 
@@ -95,8 +99,10 @@ function CreateStory() {
         start_date : start_date,
         end_date: end_date
       }, { withCredentials: true });
-      window.location.reload();
       console.log(response.data);
+
+      navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
+
     } catch (error) {
       console.log(error);
     }
