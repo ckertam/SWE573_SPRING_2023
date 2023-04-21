@@ -380,12 +380,10 @@ class UserBiographyView(views.APIView):
 
     def put(self, request):
         
-        if user_id:
-            user = get_object_or_404(User, pk=user_id)
-        else:
-            cookie_value = request.COOKIES['refreshToken']
-            user_id = decode_refresh_token(cookie_value)
-            user = get_object_or_404(User, pk=user_id)
+        
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        user = get_object_or_404(User, pk=user_id)
 
         serializer = UserBiographySerializer(user, data=request.data)
         if serializer.is_valid():
