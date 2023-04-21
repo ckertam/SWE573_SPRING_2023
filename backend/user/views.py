@@ -396,6 +396,14 @@ class StoryPhotosView(views.APIView):
         story = Story.objects.get(pk=story_id)
         photos = story.stories_photo.all()
 
+        page_number = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('size', 5))
+
+        # Paginate the photos
+        paginator = Paginator(photos, page_size)
+        total_pages = ceil(paginator.count / page_size)
+        page = paginator.get_page(page_number)
+
         response_data = []
         for photo in photos:
             file_ext = os.path.splitext(photo.photo_for_story.name)[-1].lower()
@@ -409,7 +417,14 @@ class StoryPhotosView(views.APIView):
                     'photo_for_story': data_url_prefix + base64_encoded_data
                 })
 
-        return Response(response_data, status=status.HTTP_200_OK)
+        return Response({
+            'photos': response_data,
+            'has_next': page.has_next(),
+            'has_prev': page.has_previous(),
+            'next_page': page.next_page_number() if page.has_next() else None,
+            'prev_page': page.previous_page_number() if page.has_previous() else None,
+            'total_pages': total_pages,
+        }, status=status.HTTP_200_OK)
 
 class UserPhotoView(views.APIView):
 
@@ -467,17 +482,17 @@ class UserPhotoView(views.APIView):
             return Response({'error': 'Profile photo does not exist'})
 
 
-class StoryPhotoAPIView(views.APIView):
-    serializer_class = PhotoForStorySerializer
+# class StoryPhotoAPIView(views.APIView):
+#     serializer_class = PhotoForStorySerializer
 
-    def get(self, request, story_id, format=None):
+#     def get(self, request, story_id, format=None):
 
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
-        try:
-            story = Story.objects.get(pk=story_id)
-            photos = story.stories_photo.all()
-            serializer = self.serializer_class(photos, many=True)
-            return Response(serializer.data)
-        except Story.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+#         cookie_value = request.COOKIES['refreshToken']
+#         user_id = decode_refresh_token(cookie_value)
+#         try:
+#             story = Story.objects.get(pk=story_id)
+#             photos = story.stories_photo.all()
+#             serializer = self.serializer_class(photos, many=True)
+#             return Response(serializer.data)
+#         except Story.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)

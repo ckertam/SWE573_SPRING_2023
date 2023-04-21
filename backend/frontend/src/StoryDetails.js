@@ -18,8 +18,13 @@ function StoryDetails() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [photos, setPhotos] = useState([]);
+  const [currentPhotoPage, setCurrentPhotoPage] = useState(1);
+  const [hasPrevPhotoPage, setHasPrevPhotoPage] = useState(false);
+  const [hasNextPhotoPage, setHasNextPhotoPage] = useState(false);
+  const [totalPhotoPages, setTotalPhotoPages] = useState(0);
 
 
+  const PHOTOS_PER_PAGE = 3;
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -39,18 +44,27 @@ function StoryDetails() {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}`, { withCredentials: true });
-        setPhotos(response.data.map(item => item.photo_for_story));
+        const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}?page=${currentPhotoPage}&size=3`, { withCredentials: true });
+        setPhotos(response.data.photos.map(item => item.photo_for_story));
+        setHasNextPhotoPage(response.data.has_next);
+        setHasPrevPhotoPage(response.data.has_prev);
+        setTotalPhotoPages(response.data.total_pages);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchPhotos();
-  }, [id]);
+    fetchPhotos(currentPhotoPage);
+  }, [id, currentPhotoPage]);
+
+  const handlePhotoPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPhotoPages) {
+      setCurrentPhotoPage(newPage);
+    }
+  };
 
   const fetchComments = async (page) => {
     try {
-      const response = await axios.get(`http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=3`);
+      const response = await axios.get(`http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=${PHOTOS_PER_PAGE}`);
       setComments(response.data.comments);
       setHasNextPage(response.data.has_next);
       setHasPrevPage(response.data.has_prev);
@@ -125,15 +139,34 @@ function StoryDetails() {
           <p>{`tags: ${story.story_tags}`}</p>
           <div>
             {photos &&
-              photos.map((photo, index) => (
-                <img
-                  key={index}
-                  src={photo}
-                  alt={`story photo ${index}`}
-                  width={100}
-                  height={100}
-                />
-              ))}
+              photos
+                .slice((currentPhotoPage - 1) * PHOTOS_PER_PAGE, currentPhotoPage * PHOTOS_PER_PAGE)
+                .map((photo, index) => (
+                  <img
+                    key={index}
+                    src={photo}
+                    alt={`story photo ${index}`}
+                    width={100}
+                    height={100}
+                  />
+                ))}
+          </div>
+          <div className={styles.pagination}>
+            <button onClick={() => handlePhotoPageChange(currentPhotoPage - 1)} disabled={!hasPrevPhotoPage}>
+              Previous
+            </button>
+            {Array.from({ length: totalPhotoPages }, (_, index) => (
+              <button
+                key={index}
+                className={index + 1 === currentPhotoPage ? styles.active : null}
+                onClick={() => handlePhotoPageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button onClick={() => handlePhotoPageChange(currentPhotoPage + 1)} disabled={!hasNextPhotoPage}>
+              Next
+            </button>
           </div>
           {story.location_ids.length > 0 && (
             <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
