@@ -12,6 +12,9 @@ const UserProfile = () => {
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [updatedBio, setUpdatedBio] = useState(null);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -29,6 +32,7 @@ const UserProfile = () => {
         withCredentials: true,
       });
       setUser(response.data);
+      setUpdatedBio(response.data.biography);
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
@@ -110,6 +114,18 @@ const UserProfile = () => {
     }
   };
 
+  const handleProfileBioChange = async () => {
+    try {
+      await axios.put('http://localhost:8000/user/biography', { biography: updatedBio }, {
+        withCredentials: true,
+      });
+      setUser({ ...user, biography: updatedBio });
+      setIsEditingBio(false);
+    } catch (error) {
+      console.error('Error updating biography:', error);
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -149,7 +165,18 @@ const UserProfile = () => {
         </button>
       </div>
       
-      <p>Biography: {user.biography}</p>
+      {isEditingBio ? (
+          <div>
+            <input value={updatedBio} onChange={(e) => setUpdatedBio(e.target.value)} />
+            <button type="button" onClick={handleProfileBioChange}>Save</button>
+            <button type="button" onClick={() => setIsEditingBio(false)}>Cancel</button>
+          </div>
+        ) : (
+          <div>
+            <p>Biography: {user.biography}</p>
+            <button type="button" onClick={() => setIsEditingBio(true)}>Edit</button>
+          </div>
+        )}
       <p>Followers: {user.followers.length}</p>
 
       <h2>Stories</h2>

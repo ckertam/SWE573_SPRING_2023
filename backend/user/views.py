@@ -311,18 +311,24 @@ class UserDetailsView(views.APIView):
 class UserBiographyView(views.APIView):
 
     def get(self, request):
-        user_id = auth_check(request)
-
-        user = get_object_or_404(User, pk=user_id)
+        if user_id:
+            user = get_object_or_404(User, pk=user_id)
+        else:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            user = get_object_or_404(User, pk=user_id)
 
         serializer = UserBiographySerializer(user)
         return Response(serializer.data)
 
     def put(self, request):
         
-        user_id = auth_check(request)
-
-        user = get_object_or_404(User, pk=user_id)
+        if user_id:
+            user = get_object_or_404(User, pk=user_id)
+        else:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            user = get_object_or_404(User, pk=user_id)
 
         serializer = UserBiographySerializer(user, data=request.data)
         if serializer.is_valid():
