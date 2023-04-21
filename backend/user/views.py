@@ -302,15 +302,21 @@ class StoryAuthorView(views.APIView):
     def get(self, request, user_id=None):
 
         print(request.COOKIES)
+        print(user_id)
+        cookie_value = request.COOKIES['refreshToken']
+        user_id_new = decode_refresh_token(cookie_value)
 
         if user_id:
             user = get_object_or_404(User, pk=user_id)
+            stories = Story.objects.filter(author=user_id).order_by('-creation_date')
         else:
             cookie_value = request.COOKIES['refreshToken']
             user_id = decode_refresh_token(cookie_value)
             user = get_object_or_404(User, pk=user_id)
+            user_ids = user.following.values_list('id', flat=True)
+            stories = Story.objects.filter(author__in=user_ids).order_by('-creation_date')
 
-        followed_users_ids = user.following.values_list('id', flat=True)
+        print(stories)
         #print(followed_users)
         #followed_users_ids = followed_users.values_list('id', flat=True)
 
@@ -319,7 +325,7 @@ class StoryAuthorView(views.APIView):
         page_size = int(request.query_params.get('size', 3))
 
         # Paginate the stories
-        stories = Story.objects.filter(author__in=followed_users_ids).order_by('-creation_date')
+        
         paginator = Paginator(stories, page_size)
         total_pages = ceil(paginator.count / page_size)
         page = paginator.get_page(page_number)
