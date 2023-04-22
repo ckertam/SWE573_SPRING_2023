@@ -40,3 +40,24 @@
     background-color: #4caf50;
     color: white;
   }
+
+  .heart-button {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0;
+    margin: 0;
+    outline: none;
+  }
+  
+  .heart-clicked {
+    animation: click-animation 0.15s ease;
+  }
+  
+  @keyframes click-animation {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+  }

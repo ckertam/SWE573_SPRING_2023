@@ -173,7 +173,9 @@ class AddStoryPhotoView(views.APIView):
 
 class LikeStoryView(views.APIView):
     def post(self, request, pk):
-        user_id = auth_check(request)
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
         
         story = Story.objects.get(pk=pk)
         # Check if the user has already liked the story
@@ -190,6 +192,9 @@ class LikeStoryView(views.APIView):
             
 class StoryDetailView(views.APIView): ##need to add auth here?
     def get(self, request, pk):
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
         try:
             story = Story.objects.get(pk=pk)
         except Story.DoesNotExist:

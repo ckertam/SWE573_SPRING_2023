@@ -22,24 +22,48 @@ function StoryDetails() {
   const [hasPrevPhotoPage, setHasPrevPhotoPage] = useState(false);
   const [hasNextPhotoPage, setHasNextPhotoPage] = useState(false);
   const [totalPhotoPages, setTotalPhotoPages] = useState(0);
+  const [numLikes, setNumLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+
 
 
   const PHOTOS_PER_PAGE = 3;
 
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/user/user', { withCredentials: true });
+      setUserId(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   useEffect(() => {
     const fetchStory = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`);
+        await fetchUserDetails(); // Get the current user ID
+        const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`, { withCredentials: true });
         setStory(response.data);
+        setNumLikes(response.data.likes.length);
         const authorResponse = await axios.get(`http://localhost:8000/user/usernamesbyId?user_ids[]=${response.data.author}`);
-        
         setAuthor(authorResponse.data);
+  
+        // Check if the user has liked the story and set the 'liked' state accordingly
+        if (userId && response.data.likes.includes(userId)) {
+          setLiked(true);
+        } else {
+          setLiked(false);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     fetchStory();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -138,6 +162,20 @@ function StoryDetails() {
     return <>{markers}</>;
   }
 
+  const handleLikeDislike = async () => {
+    try {
+      const response = await axios.post(`http://localhost:8000/user/like/${id}`, {}, { withCredentials: true });
+      if (response.data.message === 'Like added successfully.') {
+        setNumLikes(numLikes + 1);
+        setLiked(true);
+      } else {
+        setNumLikes(numLikes - 1);
+        setLiked(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -151,6 +189,28 @@ function StoryDetails() {
           <p>{`Time: ${formatDate()}`}</p>
           <p>{`content: ${story.content}`}</p>
           <p>{`tags: ${story.story_tags}`}</p>
+          <div>
+          <span>{numLikes} </span>
+          <button
+            className={`heart-button${liked ? ' liked' : ''}`}
+            onClick={handleLikeDislike}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={liked ? 'red' : 'none'}
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 21c-.24 0-.48-.05-.7-.15L2.5 15.5C1.5 14.8 1 13.5 1 12c0-3.3 2.7-6 6-6 2.2 0 4.4 1.7 5 4 .6-2.3 2.8-4 5-4 3.3 0 6 2.7 6 6 0 1.5-.5 2.8-1.5 3.5l-8.8 5.3c-.3.2-.7.2-1 .2z" />
+            </svg>
+          </button>
+        </div>
           <div>
             {photos &&
               photos

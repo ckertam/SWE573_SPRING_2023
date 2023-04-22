@@ -93,7 +93,7 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year', 'date','creation_date','start_date','end_date']
+        fields = ['id', 'author', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year', 'date','creation_date','start_date','end_date','likes']
 
     def validate(self, attrs):
         date_type = attrs.get('date_type')
