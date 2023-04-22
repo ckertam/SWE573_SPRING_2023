@@ -124,6 +124,20 @@ function StoryDetails() {
     }
   };
 
+  function StoryMarkers({ locations }) {
+    const markers = locations.map((location, index) => (
+      <Marker
+        key={index}
+        position={{
+          lat: parseFloat(location.latitude),
+          lng: parseFloat(location.longitude),
+        }}
+      />
+    ));
+  
+    return <>{markers}</>;
+  }
+
 
   return (
     <div>
@@ -173,30 +187,21 @@ function StoryDetails() {
             )}
           </div>
           {story.location_ids.length > 0 && (
-            <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-            <GoogleMap
-              mapContainerStyle={{ height: '400px', width: '100%' }}
-              zoom={12}
-              center={{
-                lat: parseFloat(story.location_ids[0].latitude),
-                lng: parseFloat(story.location_ids[0].longitude),
-              }}
-            >
-              {story.location_ids.map((location, index) => {
-                console.log('Location:', location); // Add this line
-                return (
-                  <Marker
-                    key={index}
-                    position={{
-                      lat: parseFloat(location.latitude),
-                      lng: parseFloat(location.longitude),
+              <>
+                <div style={{ width: '100%', height: '400px' }}>
+                  <GoogleMap
+                    mapContainerStyle={{ height: '100%', width: '100%' }}
+                    zoom={12}
+                    center={{
+                      lat: parseFloat(story.location_ids[0].latitude),
+                      lng: parseFloat(story.location_ids[0].longitude),
                     }}
-                  />
-                );
-              })}
-            </GoogleMap>
-          </LoadScriptNext>
-          )}
+                  >
+                    <StoryMarkers locations={story.location_ids} />
+                  </GoogleMap>
+                </div>
+              </>
+            )}
           <h2>Comments</h2>
           {comments &&
             comments.map((comment) => (

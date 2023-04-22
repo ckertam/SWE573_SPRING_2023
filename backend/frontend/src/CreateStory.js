@@ -101,7 +101,7 @@ function CreateStory() {
       }, { withCredentials: true });
       console.log(response.data);
 
-      navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
+navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
 
     } catch (error) {
       console.log(error);
@@ -109,7 +109,7 @@ function CreateStory() {
   };
 
   return (
-    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={['places']}>
+    <>
       <form onSubmit={handleSubmit}>
         <h1>Create Story</h1>
         <div className="form-group">
@@ -206,7 +206,7 @@ function CreateStory() {
       />
     ))}
   </GoogleMap>
-</LoadScript>
+</>
 );
 }
 
