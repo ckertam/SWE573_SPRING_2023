@@ -9,13 +9,14 @@ from django.shortcuts import get_object_or_404
 import json
 from rest_framework.permissions import AllowAny
 from django.http import HttpResponse, HttpResponseNotFound
-import os
+import os,base64
 from django.core.paginator import Paginator
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from math import ceil
-from rest_framework.exceptions import PermissionDenied
-import base64
+from rest_framework.exceptions import PermissionDenied 
+from django.db.models import Q
+
 
 
 class UserRegistrationView(views.APIView):
@@ -490,17 +491,15 @@ class UserPhotoView(views.APIView):
             return Response({'error': 'Profile photo does not exist'})
 
 
-# class StoryPhotoAPIView(views.APIView):
-#     serializer_class = PhotoForStorySerializer
+class SearchUserView(views.APIView):
 
-#     def get(self, request, story_id, format=None):
+    def get(self, request, *args, **kwargs):
+        search_query = request.query_params.get('search', '')
 
-#         cookie_value = request.COOKIES['refreshToken']
-#         user_id = decode_refresh_token(cookie_value)
-#         try:
-#             story = Story.objects.get(pk=story_id)
-#             photos = story.stories_photo.all()
-#             serializer = self.serializer_class(photos, many=True)
-#             return Response(serializer.data)
-#         except Story.DoesNotExist:
-#             return Response(status=status.HTTP_404_NOT_FOUND)
+        # Search for users by username
+        user_queryset = User.objects.filter(Q(username__icontains=search_query))
+        users_serializer = UsersSerializer(user_queryset, many=True)
+
+        return Response({
+            "users": users_serializer.data,
+        }, status=status.HTTP_200_OK)

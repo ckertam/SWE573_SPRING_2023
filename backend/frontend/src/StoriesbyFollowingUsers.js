@@ -12,6 +12,7 @@ function StoriesByFollowingsUsers() {
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useNavigate();
 
@@ -55,8 +56,21 @@ function StoriesByFollowingsUsers() {
     }
   };
 
+  const handleSearch = async () => {
+    navigate(`/SearchUserResults/${searchQuery}`);
+  };
+
   return (
     <div>
+      <div className={styles.search}>
+      <input
+        type="text"
+        placeholder="Search users and stories..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <button onClick={handleSearch}>Search</button>
+      </div>
       {loading ? (
         <p>Loading...</p>
       ) : (

@@ -11,6 +11,7 @@ import UserProfile from './UserProfile';
 import UserProfileOthers from './UserProfileOthers';
 import AddPhotoToStory from './AddPhotoToStory';
 import { LoadScriptNext } from "@react-google-maps/api";
+import SearchUserResults from './SearchUserResults';
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/story/:id" element={<StoryDetails />} />
             <Route path="/user-profile" element={<UserProfile />} />
             <Route path="/user-profile/:id" element={<UserProfileOthers />} />
+            <Route path="/SearchUserResults/:searchQuery" element={<SearchUserResults />} />
           </Routes>
         </LoadScriptNext>
       </div>

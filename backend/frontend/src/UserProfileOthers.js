@@ -35,6 +35,16 @@ const UserProfileOthers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
+        const currentUser = await getCurrentUser();
+
+        if (Number(id) === currentUser) {
+          console.log("caner")
+          navigate('/user-profile');
+          return;
+        }
+
+
         const userDetailsResponse = await axios.get(`http://localhost:8000/user/userDetails/${id}`, {
           headers: {},
           withCredentials: true,
@@ -67,7 +77,6 @@ const UserProfileOthers = () => {
         withCredentials: true,
         });
         console.log('Followers response:', followersResponse.data);
-        const currentUser = await getCurrentUser();
         
         console.log(followersResponse.data)
         const isCurrentUserFollowing = followersResponse.data.some(

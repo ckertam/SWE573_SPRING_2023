@@ -183,9 +183,12 @@ function StoryDetails() {
       {story && author ? (
         <>
           <h1>{story.title}</h1>
-          <h3 className={styles.author} onClick={() => handleUserClick(story.author)}>
-            {`author: ${author}`}
-          </h3>
+          <p>
+            author:{' '}
+            <span className={styles.author} onClick={() => handleUserClick(story.author)}>
+              {author}
+            </span>
+          </p>
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
           <p>{`Time: ${formatDate()}`}</p>
           <p>{`content: ${story.content}`}</p>
