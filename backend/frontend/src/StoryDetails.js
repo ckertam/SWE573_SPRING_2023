@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams,useNavigate  } from 'react-router-dom';
 import styles from './StoryDetails.module.css';
 import { GoogleMap, LoadScriptNext, Marker } from '@react-google-maps/api';
+import withAuth from './authCheck';
 
 
 
@@ -309,5 +310,5 @@ function StoryDetails() {
   );
 }
 
+export default withAuth(StoryDetails);
 
-export default StoryDetails;

@@ -71,14 +71,13 @@ class UserLoginView(views.APIView):
         return response
 
 class AuthUserAPIView(views.APIView):
-    def get(self,request):
-
-        #user_id = auth_check(request) #when using postman
-        print(request.COOKIES)
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
-
-        return Response(user_id)
+    def get(self, request):
+        try:
+            cookie_value = request.COOKIES['refreshToken']
+            user_id = decode_refresh_token(cookie_value)
+            return Response(user_id, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'user_id': None, 'is_authenticated': False}, status=status.HTTP_401_UNAUTHORIZED)
 
 class RefreshUserAuthAPIView(views.APIView):
     def post(self,request):

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
+import withAuth from './authCheck';
 
 function CreateStory() {
 
@@ -210,4 +211,4 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
 );
 }
 
-export default CreateStory;
+export default withAuth(CreateStory);

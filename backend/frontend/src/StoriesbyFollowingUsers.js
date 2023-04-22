@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from './StoriesByFollowingsUsers.module.css';
+import withAuth from './authCheck';
 
 function StoriesByFollowingsUsers() {
   const [stories, setStories] = useState([]);
@@ -87,4 +88,4 @@ function StoriesByFollowingsUsers() {
   );
 }
 
-export default StoriesByFollowingsUsers;
+export default withAuth(StoriesByFollowingsUsers);

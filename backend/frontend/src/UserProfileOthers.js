@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams,useNavigate } from 'react-router-dom';
 import './UserProfile.css';
+import withAuth from './authCheck';
 
 const UserProfileOthers = () => {
   const [user, setUser] = useState(null);
@@ -195,4 +196,5 @@ const UserProfileOthers = () => {
   );
 };
 
-export default UserProfileOthers;
+
+export default withAuth(UserProfileOthers);
