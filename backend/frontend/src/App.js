@@ -12,6 +12,7 @@ import UserProfileOthers from './UserProfileOthers';
 import AddPhotoToStory from './AddPhotoToStory';
 import { LoadScriptNext } from "@react-google-maps/api";
 import SearchUserResults from './SearchUserResults';
+import StorySearch from './StorySearch';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Link to="/register" className="nav-item nav-link">Register</Link>
             <Link to="/login" className="nav-item nav-link">Login</Link>
             <Link to="/homepage" className="nav-item nav-link">Home Page</Link>
+            <Link to="/story_search" className="nav-item nav-link">Search Stories</Link>
             <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
             <Link to="/user-profile" className="nav-item nav-link">User Profile</Link>
           </div>
@@ -41,6 +43,7 @@ function App() {
             <Route path="/user-profile" element={<UserProfile />} />
             <Route path="/user-profile/:id" element={<UserProfileOthers />} />
             <Route path="/SearchUserResults/:searchQuery" element={<SearchUserResults />} />
+            <Route path="/story_search" element={<StorySearch />} />
           </Routes>
         </LoadScriptNext>
       </div>

@@ -24,19 +24,6 @@ function StoriesByFollowingsUsers() {
         setHasNextPage(storiesResponse.data.has_next);
         setHasPrevPage(storiesResponse.data.has_prev);
         setTotalPages(storiesResponse.data.total_pages);
-
-        const authorIds = storiesResponse.data.stories.map(story => story.author);
-        if (authorIds.length > 0) {
-          const usernamesPromises = authorIds.map(id =>
-            axios.get(`http://localhost:8000/user/usernamesbyId?user_ids[]=${id}`)
-          );
-          const usernamesResponses = await Promise.all(usernamesPromises);
-          const newusernames = usernamesResponses.reduce((obj, response, index) => {
-            obj[authorIds[index]] = response.data;
-            return obj;
-          }, {});
-          setUsernames(newusernames);
-        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -65,7 +52,7 @@ function StoriesByFollowingsUsers() {
       <div className={styles.search}>
       <input
         type="text"
-        placeholder="Search users and stories..."
+        placeholder="Search usernames..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
@@ -77,7 +64,7 @@ function StoriesByFollowingsUsers() {
         stories.map(story => (
           <div key={story.id}>
             <h3 className={styles.title} onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
-            <p>Author: {usernames[story.author] || 'Unknown'}</p>
+            <p>Author: {story.author_username || 'Unknown'}</p>
           </div>
         ))
       )}

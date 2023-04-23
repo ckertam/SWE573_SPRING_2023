@@ -28,5 +28,7 @@ urlpatterns = [
     path('storyPhotoOps/<int:story_id>',AddStoryPhotoView.as_view()),
     path('storyPhotoOps/<int:story_id>/<int:photo_id>',AddStoryPhotoView.as_view()),
     path('searchUser', SearchUserView.as_view(), name='search'),
+    path('storySearch', SearchStoryView.as_view(), name='search'),
+    
     # path('photoForStory/<int:story_id>', StoryPhotoAPIView.as_view()),
 ]

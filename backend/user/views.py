@@ -493,7 +493,14 @@ class UserPhotoView(views.APIView):
 
 class SearchUserView(views.APIView):
 
+    
+
     def get(self, request, *args, **kwargs):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        user = get_object_or_404(User, pk=user_id)
+
         search_query = request.query_params.get('search', '')
 
         # Search for users by username
@@ -502,4 +509,43 @@ class SearchUserView(views.APIView):
 
         return Response({
             "users": users_serializer.data,
+        }, status=status.HTTP_200_OK)
+    
+class SearchStoryView(views.APIView):
+
+    def get(self, request, *args, **kwargs):
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+        user = get_object_or_404(User, pk=user_id)
+
+        title_search = request.query_params.get('title', '')
+        author_search = request.query_params.get('author', '')
+
+        query_filter = Q()
+        if title_search:
+            query_filter &= Q(title__icontains=title_search)
+        if author_search:
+            query_filter &= Q(author__username__icontains=author_search)
+
+        stories = Story.objects.filter(query_filter)
+
+        # Get the page number and size
+        page_number = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('size', 10))
+
+        # Paginate the stories
+        paginator = Paginator(stories, page_size)
+        total_pages = ceil(paginator.count / page_size)
+        page = paginator.get_page(page_number)
+
+        serializer = StorySerializer(page, many=True)
+
+        return Response({
+            'stories': serializer.data,
+            'has_next': page.has_next(),
+            'has_prev': page.has_previous(),
+            'next_page': page.next_page_number() if page.has_next() else None,
+            'prev_page': page.previous_page_number() if page.has_previous() else None,
+            'total_pages': total_pages,
         }, status=status.HTTP_200_OK)
