@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+import axios from 'axios';
 import Register from './Register';
 import Login from './Login';
 import CreateStory from './CreateStory';
@@ -13,29 +14,79 @@ import AddPhotoToStory from './AddPhotoToStory';
 import { LoadScriptNext } from "@react-google-maps/api";
 import SearchUserResults from './SearchUserResults';
 import StorySearch from './StorySearch';
-
+import mainPhoto from './assets/images/homePage4.png'
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/user/user', { withCredentials: true });
+      if (response) {
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserDetails()
+  }, []);
+
+  console.log(isLoggedIn)
+
   return (
     <Router>
       <div className="container">
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
           <div className="navbar-nav">
+          {!isLoggedIn && (
+            <>
             <Link to="/" className="nav-item nav-link">Home</Link>
             <Link to="/register" className="nav-item nav-link">Register</Link>
             <Link to="/login" className="nav-item nav-link">Login</Link>
-            <Link to="/homepage" className="nav-item nav-link">Home Page</Link>
+            </>
+            )}
+            {isLoggedIn && (
+            <>
+            <Link to="/homepage" className="nav-item nav-link"><img
+                src={mainPhoto}
+                alt="Home Page"
+                style={{ width: '50px', height: '50px' }}
+              /></Link>
             <Link to="/story_search" className="nav-item nav-link">Search Stories</Link>
             <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
             <Link to="/user-profile" className="nav-item nav-link">User Profile</Link>
+            </>
+            )}
           </div>
         </nav>
+        {isLoggedIn && (
         <LogoutButton />
+        )}
         <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={['places']}>
           <Routes>
-            <Route path="/" element={<h1>Welcome to my app!</h1>} />
+          {!isLoggedIn && (
+              <>
+            <Route path="/" element={
+                  <div className="home-container">
+                    <img
+                      src={mainPhoto}
+                      alt="Memories"
+                      style={{ width: '1000px', height: 'auto' }}
+                    />
+                  </div>
+                } />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            </>
+            )}
+            
+            {isLoggedIn && (
+              <>
             <Route path="/homepage" element={<StoriesByFollowingsUsers />} />
             <Route path="/create-story" element={<CreateStory />} />
             <Route path="/create-story/add-photo/:story_id" element={<AddPhotoToStory />} />
@@ -44,6 +95,8 @@ function App() {
             <Route path="/user-profile/:id" element={<UserProfileOthers />} />
             <Route path="/SearchUserResults/:searchQuery" element={<SearchUserResults />} />
             <Route path="/story_search" element={<StorySearch />} />
+            </>
+            )}
           </Routes>
         </LoadScriptNext>
       </div>

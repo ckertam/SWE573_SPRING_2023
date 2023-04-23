@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
 import withAuth from './authCheck';
+import styles from './CreateStory.module.css';
 
 function CreateStory() {
 
@@ -136,7 +137,7 @@ function CreateStory() {
           </div>
           <div className="form-group">
           <label>Content:</label>
-          <textarea className="form-control" onChange={(e) => setContent(e.target.value)}></textarea>
+          <textarea className={styles.storyContent} onChange={(e) => setContent(e.target.value)}></textarea>
           </div>
           <div className="form-group">
           <label>Story Tags:</label>

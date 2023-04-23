@@ -121,7 +121,6 @@ class StorySerializer(serializers.ModelSerializer):
 
         location_data = validated_data.pop('location_ids')
         for location in location_data:
-            # Encode the location name using URL encoding
             location['name'] = urllib.parse.quote(location['name'], safe='')
             locations = [Location.objects.create(**location) for location in location_data]
 
