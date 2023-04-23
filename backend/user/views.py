@@ -16,6 +16,8 @@ from django.core.files.storage import FileSystemStorage
 from math import ceil
 from rest_framework.exceptions import PermissionDenied 
 from django.db.models import Q
+from datetime import datetime, timedelta
+
 
 
 
@@ -512,21 +514,48 @@ class SearchUserView(views.APIView):
         }, status=status.HTTP_200_OK)
     
 class SearchStoryView(views.APIView):
-
     def get(self, request, *args, **kwargs):
-
         cookie_value = request.COOKIES['refreshToken']
         user_id = decode_refresh_token(cookie_value)
         user = get_object_or_404(User, pk=user_id)
 
         title_search = request.query_params.get('title', '')
         author_search = request.query_params.get('author', '')
+        time_type = request.query_params.get('time_type', '')
+        time_value = request.query_params.get('time_value', '')
 
         query_filter = Q()
         if title_search:
             query_filter &= Q(title__icontains=title_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
+
+        if time_type and time_value:
+            print("caner")
+            print(time_value)
+            print(time_type)
+            time_value = json.loads(time_value)
+            print(time_value)
+            if time_type == 'season':
+                time_value = time_value["seasonName"]
+                query_filter &= Q(season_name__icontains=time_value)
+            elif time_type == 'decade':
+                time_value = time_value["year"]
+                query_filter &= Q(year__gte=time_value) ##here can be change for now it shows greater than of that year
+            elif time_type == 'normal_date':
+                given_date = datetime.strptime(time_value["date"], "%Y-%m-%d").date()
+
+                # Calculate the date range
+                start_date = given_date - timedelta(days=2)
+                end_date = given_date + timedelta(days=2)
+                query_filter &= Q(date__range=(start_date, end_date)) ##I can change the date to get 2 dates for interval on normal_date too
+                #time_value = time_value["date"]
+                ##query_filter &= Q(date=time_value)
+            elif time_type == 'interval_date':
+                query_filter &= Q(
+                    start_date__gte=time_value['startDate'],
+                    end_date__lte=time_value['endDate']
+                )
 
         stories = Story.objects.filter(query_filter)
 
