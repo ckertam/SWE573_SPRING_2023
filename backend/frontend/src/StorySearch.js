@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 import styles from './StorySearch.module.css'
 
 
@@ -18,6 +19,11 @@ const StorySearch = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  const [locationSearch, setLocationSearch] = useState(null);
+  const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
+  const [markerPosition, setMarkerPosition] = useState(mapCenter);
+  const autocompleteRef = useRef(null);
+
   const navigate = useNavigate();
 
   const handleStoryClick = async (id) => {
@@ -27,8 +33,6 @@ const StorySearch = () => {
   const handleUserClick = async (id) => {
     navigate(`/user-profile/${id}`);
   };
-
-  
 
   const handleSearch = async (e,pageNumber = 1) => {
     e.preventDefault();
@@ -61,6 +65,7 @@ const StorySearch = () => {
             size: pageSize,
             time_type: timeType,
             time_value: JSON.stringify(timeValueObj),
+            location: JSON.stringify(locationSearch),
           },
         withCredentials: true,
       });
@@ -69,7 +74,7 @@ const StorySearch = () => {
       setCurrentPage(pageNumber);
     } catch (error) {
       console.error('Error fetching stories:', error);
-    }
+    } 
   };
 
   const handlePageChange = (newPage) => {
@@ -157,6 +162,40 @@ const StorySearch = () => {
     return pageNumbers;
   };
 
+  const handleLocationSelect = () => {
+    if (!autocompleteRef.current) {
+      return;
+    }
+  
+    const place = autocompleteRef.current.getPlace();
+  
+    if (!place || !place.geometry || !place.geometry.location) {
+      return;
+    }
+  
+    const locationData = {
+      name: place.name,
+      latitude: Number(place.geometry.location.lat().toFixed(6)),
+      longitude: Number(place.geometry.location.lng().toFixed(6)),
+    };
+  
+    setLocationSearch(locationData);
+    setMapCenter({ lat: locationData.latitude, lng: locationData.longitude });
+  };
+
+  const handleMarker = (e) => {
+    const newPosition = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    };
+    setMarkerPosition(newPosition);
+    setLocationSearch({
+      name: 'Custom Location',
+      latitude: Number(newPosition.lat.toFixed(6)),
+      longitude: Number(newPosition.lng.toFixed(6)),
+    });
+  };
+
 
   return (
     <div>
@@ -194,6 +233,37 @@ const StorySearch = () => {
         </select>
       </div>
       {renderTimeInput()}
+        <div className="form-group">
+            <label>Location:</label>
+            <Autocomplete
+            onLoad={(autocomplete) => {
+                autocompleteRef.current = autocomplete;
+            }}
+            onPlaceChanged={handleLocationSelect}
+            >
+            <input type="text" className="form-control" />
+            </Autocomplete>
+        </div>
+        {locationSearch && (
+            <div className="form-group">
+                <GoogleMap
+                id="search-map"
+                mapContainerStyle={{
+                    width: '100%',
+                    height: '400px',
+                }}
+                zoom={8}
+                center={markerPosition}
+                onClick={(e) => handleMarker(e)}
+                >
+                <Marker
+                    position={markerPosition}
+                    draggable={true}
+                    onDragEnd={(e) => handleMarker(e)}
+                />
+                </GoogleMap>
+            </div>
+        )}
       <button type="submit">Search</button>
     </form>  
       {stories.length > 0 && (

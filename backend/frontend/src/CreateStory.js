@@ -205,15 +205,6 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
     onClick={handleMapClick}
     onLoad={handleMapLoad}
   >
-    {/* {searchBox && //probably not necessary
-      <Autocomplete
-        bounds={null}
-        onLoad={() => console.log('autocomplete loaded')}
-        onPlaceChanged={handlePlacesChanged}
-      >
-        <input type="text" placeholder="Search on map" />
-      </Autocomplete>
-    } */}
     {location_ids.map((loc, index) => (
       <Marker
         key={index}

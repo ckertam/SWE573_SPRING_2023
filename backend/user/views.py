@@ -13,7 +13,7 @@ import os,base64
 from django.core.paginator import Paginator
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
-from math import ceil
+from math import ceil,cos, radians
 from rest_framework.exceptions import PermissionDenied 
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -481,7 +481,7 @@ class UserPhotoView(views.APIView):
         user = get_object_or_404(User, pk=user_id)
 
         if user.profile_photo:
-            # Create a FileSystemStorage object to interact with the file system
+            # Create a FileSystemStorage object 
             storage = FileSystemStorage()
             # Delete the file from the storage
             storage.delete(user.profile_photo.name)
@@ -523,6 +523,7 @@ class SearchStoryView(views.APIView):
         author_search = request.query_params.get('author', '')
         time_type = request.query_params.get('time_type', '')
         time_value = request.query_params.get('time_value', '')
+        location = request.query_params.get('location', '')
 
         query_filter = Q()
         if title_search:
@@ -531,11 +532,9 @@ class SearchStoryView(views.APIView):
             query_filter &= Q(author__username__icontains=author_search)
 
         if time_type and time_value:
-            print("caner")
-            print(time_value)
-            print(time_type)
+
             time_value = json.loads(time_value)
-            print(time_value)
+
             if time_type == 'season':
                 time_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=time_value)
@@ -556,14 +555,23 @@ class SearchStoryView(views.APIView):
                     start_date__gte=time_value['startDate'],
                     end_date__lte=time_value['endDate']
                 )
+        if location:
+            location = json.loads(location)
+            lat = location['latitude']
+            lng = location['longitude']
+            radius = 10  # radius set for near search
 
+            query_filter &= Q(
+                location_ids__latitude__range=(lat - radius / 110.574, lat + radius / 110.574),
+                location_ids__longitude__range=(lng - radius / (111.320 * cos(radians(lat))), lng + radius / (111.320 * cos(radians(lat))))
+            )
         stories = Story.objects.filter(query_filter)
 
-        # Get the page number and size
+        # Page sizes and numbers
         page_number = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('size', 10))
 
-        # Paginate the stories
+        
         paginator = Paginator(stories, page_size)
         total_pages = ceil(paginator.count / page_size)
         page = paginator.get_page(page_number)
