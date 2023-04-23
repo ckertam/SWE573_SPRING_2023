@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useParams,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AddPhotoToStory.css';
@@ -7,12 +7,25 @@ function AddPhotoToStory() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [uploadedPhotos, setUploadedPhotos] = useState([]);
+    const [story, setStory] = useState(null);
+    const { story_id } = useParams();
 
-  const { story_id, story_title } = useParams();
+    const navigate = useNavigate();
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchStory = async () => {
+      try {
+        const responseStory = await axios.get(`http://localhost:8000/user/storyGet/${story_id}`, { withCredentials: true });
+        console.log(responseStory)
+        console.log(responseStory.data)
+        setStory(responseStory.data);
 
-  const decodedStoryTitle = decodeURIComponent(story_title);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchStory();
+  }, []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -78,7 +91,7 @@ function AddPhotoToStory() {
 
   return (
     <div>
-      <h2>Story Title: {decodedStoryTitle}</h2>
+    {story ? <h2>Story Title: {story.title}</h2> : <h2>Loading story...</h2>}
       <label className="file-upload-container">
         <input type="file" onChange={handleFileChange} />
         <span className="file-upload-text">Choose a photo</span>

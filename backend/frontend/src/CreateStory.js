@@ -118,7 +118,7 @@ function CreateStory() {
       }, { withCredentials: true });
       console.log(response.data);
 
-  navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
+  navigate(`/create-story/add-photo/${response.data.id}`);
 
       } catch (error) {
         console.log(error);
