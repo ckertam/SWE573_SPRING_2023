@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
+import { GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
 import withAuth from './authCheck';
 
 function CreateStory() {
@@ -89,17 +89,17 @@ function CreateStory() {
     setLocations(location_ids.filter((loc, i) => i !== index));
   };
 
-  const handlePlacesChanged = () => {
-    const place = searchBox.getPlaces()[0];
-    if (place) {
-      const locationData = {
-        name: place.name,
-        latitude: Number(place.geometry.location.lat().toFixed(6)),
-        longitude: Number(place.geometry.location.lng().toFixed(6)),
-      };
-      setLocations([...location_ids, locationData]);
-    }
-  };
+  // const handlePlacesChanged = () => {
+  //   const place = searchBox.getPlaces()[0];
+  //   if (place) {
+  //     const locationData = {
+  //       name: place.name,
+  //       latitude: Number(place.geometry.location.lat().toFixed(6)),
+  //       longitude: Number(place.geometry.location.lng().toFixed(6)),
+  //     };
+  //     setLocations([...location_ids, locationData]);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,17 +118,18 @@ function CreateStory() {
       }, { withCredentials: true });
       console.log(response.data);
 
-navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
+  navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title)}`);
 
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
         <h1>Create Story</h1>
+        <button type="submit" className="btn btn-primary">Create Story</button>
         <div className="form-group">
           <label>Title:</label>
           <input type="text" className="form-control" onChange={(e) => setTitle(e.target.value)} />
@@ -140,25 +141,6 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
           <div className="form-group">
           <label>Story Tags:</label>
           <input type="text" className="form-control" onChange={(e) => setStoryTags(e.target.value)} />
-          </div>
-          <div className="form-group">
-          <label>Locations:</label>
-          <Autocomplete
-            onLoad={(autocomplete) => {
-              autocompleteRef.current = autocomplete;
-            }}
-            onPlaceChanged={handleLocationSelect}
-          >
-            <input type="text" className="form-control" ref={inputRef} />
-          </Autocomplete>
-          <ul>
-          {location_ids.map((loc, index) => (
-            <div key={index}>
-              <li>{loc.name || `${loc.latitude}, ${loc.longitude}`}</li>
-              <button type="button" onClick={() => handleLocationRemove(index)}>Remove</button>
-            </div>
-          ))}
-          </ul>
           </div>
           <div className="form-group">
       <label>Date Type:</label>
@@ -195,9 +177,16 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
         <input type="date" className="form-control" onChange={(e) => setEndDate(e.target.value)} />
       </div>
     }
-    <button type="submit" className="btn btn-primary">Create Story</button>
   </form>
-
+  <label>Locations:</label>
+    <Autocomplete
+      onLoad={(autocomplete) => {
+        autocompleteRef.current = autocomplete;
+      }}
+      onPlaceChanged={handleLocationSelect}
+    >
+      <input type="text" className="form-control" ref={inputRef} />
+    </Autocomplete>
   <GoogleMap
     mapContainerStyle={{ height: '400px', width: '100%' }}
     center={mapCenter}
@@ -214,6 +203,16 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
       />
     ))}
   </GoogleMap>
+  <div className="form-group">
+    <ul>
+    {location_ids.map((loc, index) => (
+      <div key={index}>
+        <li>{loc.name || `${loc.latitude}, ${loc.longitude}`}</li>
+        <button type="button" onClick={() => handleLocationRemove(index)}>Remove</button>
+      </div>
+    ))}
+    </ul>
+    </div>
 </>
 );
 }
