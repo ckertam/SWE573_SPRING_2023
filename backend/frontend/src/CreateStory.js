@@ -24,15 +24,31 @@ function CreateStory() {
 
   const autocompleteRef = useRef(null);
 
+  const inputRef = useRef(null);  
+
   const handleLocationSelect = () => {
+    if (!autocompleteRef.current) {
+      return;
+    }
+  
     const place = autocompleteRef.current.getPlace();
+  
+    if (!place || !place.geometry || !place.geometry.location) {
+      return;
+    }
+  
     const locationData = {
       name: place.name,
       latitude: Number(place.geometry.location.lat().toFixed(6)),
       longitude: Number(place.geometry.location.lng().toFixed(6)),
     };
     setLocations([...location_ids, locationData]);
-    setMapCenter({ lat: locationData.latitude, lng: locationData.longitude});
+    setMapCenter({ lat: locationData.latitude, lng: locationData.longitude });
+  
+    // Clear the input value
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   useEffect(() => {
@@ -58,7 +74,7 @@ function CreateStory() {
         };
         setLocations([...location_ids, locationData]);
 
-        setMapCenter({ lat: locationData.latitude, lng: locationData.longitude});
+        setMapCenter({ lat: locationData.latitude, lng: locationData.longitude}); //can be excluded so that map not always clicked
       }
     } catch (error) {
       console.log(error);
@@ -128,12 +144,12 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
           <div className="form-group">
           <label>Locations:</label>
           <Autocomplete
-          onLoad={(autocomplete) => {
-          autocompleteRef.current = autocomplete;
-          }}
-          onPlaceChanged={handleLocationSelect}
+            onLoad={(autocomplete) => {
+              autocompleteRef.current = autocomplete;
+            }}
+            onPlaceChanged={handleLocationSelect}
           >
-          <input type="text" className="form-control" />
+            <input type="text" className="form-control" ref={inputRef} />
           </Autocomplete>
           <ul>
           {location_ids.map((loc, index) => (
@@ -189,7 +205,7 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
     onClick={handleMapClick}
     onLoad={handleMapLoad}
   >
-    {searchBox &&
+    {/* {searchBox && //probably not necessary
       <Autocomplete
         bounds={null}
         onLoad={() => console.log('autocomplete loaded')}
@@ -197,7 +213,7 @@ navigate(`/create-story/add-photo/${response.data.id}/${encodeURIComponent(title
       >
         <input type="text" placeholder="Search on map" />
       </Autocomplete>
-    }
+    } */}
     {location_ids.map((loc, index) => (
       <Marker
         key={index}
