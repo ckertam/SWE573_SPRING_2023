@@ -530,7 +530,8 @@ class SearchStoryView(views.APIView):
             query_filter &= Q(title__icontains=title_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
-
+        print(time_type)
+        print(time_value)
         if time_type and time_value:
 
             time_value = json.loads(time_value)
@@ -555,7 +556,7 @@ class SearchStoryView(views.APIView):
                     start_date__gte=time_value['startDate'],
                     end_date__lte=time_value['endDate']
                 )
-        if location:
+        if location != "null":
             location = json.loads(location)
             lat = location['latitude']
             lng = location['longitude']
