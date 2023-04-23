@@ -559,7 +559,7 @@ class SearchStoryView(views.APIView):
             location = json.loads(location)
             lat = location['latitude']
             lng = location['longitude']
-            radius = 10  # radius set for near search
+            radius = 25  # radius set for near search
 
             query_filter &= Q(
                 location_ids__latitude__range=(lat - radius / 110.574, lat + radius / 110.574),

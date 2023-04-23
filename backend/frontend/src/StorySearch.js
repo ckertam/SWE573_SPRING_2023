@@ -244,7 +244,6 @@ const StorySearch = () => {
             <input type="text" className="form-control" />
             </Autocomplete>
         </div>
-        {locationSearch && (
             <div className="form-group">
                 <GoogleMap
                 id="search-map"
@@ -252,18 +251,19 @@ const StorySearch = () => {
                     width: '100%',
                     height: '400px',
                 }}
-                zoom={8}
+                zoom={2}
                 center={markerPosition}
                 onClick={(e) => handleMarker(e)}
                 >
-                <Marker
+                {locationSearch && (
+                    <Marker
                     position={markerPosition}
                     draggable={true}
                     onDragEnd={(e) => handleMarker(e)}
-                />
+                    />
+                )}
                 </GoogleMap>
             </div>
-        )}
       <button type="submit">Search</button>
     </form>  
       {stories.length > 0 && (
