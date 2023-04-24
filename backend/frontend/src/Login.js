@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -14,9 +16,15 @@ function Login() {
       username: username,
       password: password
     },{ withCredentials: true }).then(response => {
-      console.log(response.data);
       // TODO: handle success response
-      navigate('/homepage');
+
+      if (response.status == 200) {
+        toast.success('Login successful!');
+        onLoginSuccess();
+        navigate('/homepage');
+        } else {
+          toast.error('Invalid email or password');
+        }
     }).catch(error => {
       console.log(error.response.data);
       // TODO: handle error response
@@ -36,6 +44,7 @@ function Login() {
           <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} />
         </div>
         <button type="submit" className="btn btn-primary">Login</button>
+        <ToastContainer position="bottom-right" />
       </form>
     </div>
   );

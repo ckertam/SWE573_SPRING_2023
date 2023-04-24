@@ -17,26 +17,37 @@ import StorySearch from './StorySearch';
 import mainPhoto from './assets/images/homePage4.png'
 
 function App() {
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  
+  //const isLoggedIn = withAuth();
 
   const fetchUserDetails = async () => {
     try {
       const response = await axios.get('http://localhost:8000/user/user', { withCredentials: true });
-      if (response) {
+      if (response && response.data) {
         setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
       }
     } catch (error) {
       console.log(error);
+      setIsLoggedIn(false);
     }
   };
 
   useEffect(() => {
-    fetchUserDetails()
+    fetchUserDetails();
   }, []);
 
-  console.log(isLoggedIn)
+
+  // useEffect(() => {
+  //   const loggedInUser = localStorage.getItem('token');
+  //   if (loggedInUser) {
+  //     setIsLoggedIn(true);
+  //   }
+  // }, []);
+  // console.log(isLoggedIn)
 
   return (
     <Router>
@@ -81,7 +92,7 @@ function App() {
                   </div>
                 } />
             <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
             </>
             )}
             

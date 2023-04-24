@@ -10,6 +10,7 @@ function LogoutButton() {
       if (response.data.message === 'success') {
 
         // Redirect to the home page or the login page after successful logout
+        localStorage.setItem('token', '');
         window.location.href = '/';
       }
     } catch (error) {
