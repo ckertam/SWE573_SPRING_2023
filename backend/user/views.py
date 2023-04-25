@@ -10,12 +10,10 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.db.models import Q
-from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes, smart_str
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from .sendEmail import send_password_reset_email
 import json
 import os,base64
 from math import ceil,cos, radians
@@ -61,7 +59,7 @@ class UserLoginView(views.APIView):
         
         if user is None :
             return Response({'error': 'Invalid username'}, status=400)
-        if user.check_password(password):
+        if user.password != password:
             return Response({'error': 'Wrong password'}, status=400)
         
 
@@ -606,10 +604,9 @@ class SendPasswordResetEmail(views.APIView):
             token.save()
 
             user_id = str(user.pk)
-            encoded_user_id = base64.b64encode(user_id.encode('utf-8'))
+            encoded_user_id = urlsafe_base64_encode(force_bytes(user_id))
             # Send password reset email
             subject = "Password Reset Request"
-            #uid = urlsafe_base64_encode(force_bytes(user.pk))
             token_str = default_token_generator.make_token(user)
             email_body = (
                 f"To reset your password, click the link below:\n\n"
@@ -623,9 +620,10 @@ class ResetPassword(views.APIView):
     def post(self, request, token, uidb64):
         print("caner")
         print(uidb64)
+        print(token)
 
-        user_id = base64.b64decode(uidb64.decode('utf-8'))
-        user = User.objects.get(pk=user_id)
+        user_id = smart_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=int(user_id))
 
         if default_token_generator.check_token(user, token):
             new_password = request.data.get("new_password")
@@ -634,3 +632,4 @@ class ResetPassword(views.APIView):
             return Response({"detail": "Password has been reset."}, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+        

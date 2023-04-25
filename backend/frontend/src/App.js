@@ -96,7 +96,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
             <Route path="/resetPassword" element={<ResetPasswordRequest />} />
-            <Route path="/resetPassword/:uidb64/:token" element={<ResetPasswordMain />} />
+            <Route path="/resetPassword/:token/:uidb64" element={<ResetPasswordMain />} />
             </>
             )}
             

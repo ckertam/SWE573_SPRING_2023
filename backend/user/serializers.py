@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from user.models import User,Story,Location,Comment,PhotoForStory #, Date, SpecificDate, Decade, Season
+from user.models import User,Story,Location,Comment,PhotoForStory,Content #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
 from .functions import *
 import urllib.parse
@@ -156,3 +156,7 @@ class CommentGetSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'comment_author', 'story', 'text', 'date']
 
+class ContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content
+        fields = '__all__'

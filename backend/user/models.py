@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from datetime import timedelta
 from django.utils import timezone
+from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name="e-mail", max_length = 100, unique = True)
@@ -43,7 +44,7 @@ class Story(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, null=True)
-    content = models.TextField(null=True)
+    content = RichTextField(null=True)
     creation_date = models.DateTimeField(null=True,auto_now_add=True)
     story_tags = models.CharField(max_length=255, null=True)
     location_ids = models.ManyToManyField(Location, blank=True)
@@ -91,3 +92,10 @@ class PasswordResetToken(models.Model):
             self.token = get_random_string(length=64)
             self.expires_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
+
+class Content(models.Model):
+    title = models.CharField(max_length=200)
+    content = RichTextField()
+
+    def __str__(self):
+        return self.title

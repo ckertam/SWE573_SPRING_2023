@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ResetPasswordRequest() {
   const [email, setEmail] = useState('');
+  const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -13,7 +15,7 @@ function ResetPasswordRequest() {
       email: email,
     }).then(response => {
       toast.success('Password reset email sent.');
-      navigate('/enter-reset-code');
+      setShowMessage(true);
     }).catch(error => {
       console.log(error.response.data);
     });
@@ -28,6 +30,9 @@ function ResetPasswordRequest() {
           <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} />
         </div>
         <button type="submit" className="btn btn-primary">Send Code</button>
+        {showMessage && (
+          <p className="mt-3">Open the link in your mail</p>
+        )}
         <ToastContainer position="bottom-right" />
       </form>
     </div>

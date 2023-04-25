@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
 import withAuth from './authCheck';
 import styles from './CreateStory.module.css';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function CreateStory() {
 
@@ -119,7 +121,7 @@ function CreateStory() {
       }, { withCredentials: true });
       console.log(response.data);
 
-  navigate(`/create-story/add-photo/${response.data.id}`);
+      navigate(`/story/${response.data.id}`);
 
       } catch (error) {
         console.log(error);
@@ -136,8 +138,8 @@ function CreateStory() {
           <input type="text" className="form-control" onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div className="form-group">
-          <label>Content:</label>
-          <textarea className={styles.storyContent} onChange={(e) => setContent(e.target.value)}></textarea>
+          <label htmlFor="content">Content:</label>
+          <ReactQuill value={content} onChange={setContent}/>
           </div>
           <div className="form-group">
           <label>Story Tags:</label>

@@ -8,7 +8,6 @@ function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,8 +16,9 @@ function Login({ onLoginSuccess }) {
       password: password
     },{ withCredentials: true }).then(response => {
       if (response.status == 200) {
-        toast.success('Login successful!');
+        
         onLoginSuccess();
+        toast.success('Login successful!');
         navigate('/homepage');
         } else {
           toast.error('Invalid email or password');
@@ -32,7 +32,6 @@ function Login({ onLoginSuccess }) {
       }
     });
   }
-  
 
   return (
     <div className="container">
@@ -47,7 +46,10 @@ function Login({ onLoginSuccess }) {
           <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} />
         </div>
         <button type="submit" className="btn btn-primary">Login</button>
-        <ToastContainer position="bottom-right" />
+        <ToastContainer position="bottom-right" autoClose={5000} />
+        <div className="forgot-password-link">
+          <Link to="/resetPassword">Forgot my password</Link>
+        </div>
       </form>
     </div>
   );

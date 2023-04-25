@@ -18,11 +18,11 @@ function StoryDetails() {
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-  const [photos, setPhotos] = useState([]);
-  const [currentPhotoPage, setCurrentPhotoPage] = useState(1);
-  const [hasPrevPhotoPage, setHasPrevPhotoPage] = useState(false);
-  const [hasNextPhotoPage, setHasNextPhotoPage] = useState(false);
-  const [totalPhotoPages, setTotalPhotoPages] = useState(0);
+  // const [photos, setPhotos] = useState([]);
+  // const [currentPhotoPage, setCurrentPhotoPage] = useState(1);
+  // const [hasPrevPhotoPage, setHasPrevPhotoPage] = useState(false);
+  // const [hasNextPhotoPage, setHasNextPhotoPage] = useState(false);
+  // const [totalPhotoPages, setTotalPhotoPages] = useState(0);
   const [numLikes, setNumLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -30,8 +30,8 @@ function StoryDetails() {
 
 
 
-  const PHOTOS_PER_PAGE = 3;
-
+  // const PHOTOS_PER_PAGE = 3;
+  const COMMENTS_PER_PAGE = 5;
 
   const fetchUserDetails = async () => {
     try {
@@ -66,30 +66,30 @@ function StoryDetails() {
     fetchStory();
   }, [userId]);
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}?page=${currentPhotoPage}&size=3`, { withCredentials: true });
-        setPhotos(response.data.photos.map(item => item.photo_for_story));
-        setHasNextPhotoPage(response.data.has_next);
-        setHasPrevPhotoPage(response.data.has_prev);
-        setTotalPhotoPages(response.data.total_pages);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchPhotos(currentPhotoPage);
-  }, [id, currentPhotoPage]);
+  // useEffect(() => {
+  //   const fetchPhotos = async () => {
+  //     try {
+  //       const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}?page=${currentPhotoPage}&size=3`, { withCredentials: true });
+  //       setPhotos(response.data.photos.map(item => item.photo_for_story));
+  //       setHasNextPhotoPage(response.data.has_next);
+  //       setHasPrevPhotoPage(response.data.has_prev);
+  //       setTotalPhotoPages(response.data.total_pages);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchPhotos(currentPhotoPage);
+  // }, [id, currentPhotoPage]);
 
-  const handlePhotoPageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPhotoPages) {
-      setCurrentPhotoPage(newPage);
-    }
-  };
+  // const handlePhotoPageChange = (newPage) => {
+  //   if (newPage >= 1 && newPage <= totalPhotoPages) {
+  //     setCurrentPhotoPage(newPage);
+  //   }
+  // };
 
   const fetchComments = async (page) => {
     try {
-      const response = await axios.get(`http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=${PHOTOS_PER_PAGE}`);
+      const response = await axios.get(`http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=${COMMENTS_PER_PAGE}`);
       setComments(response.data.comments);
       setHasNextPage(response.data.has_next);
       setHasPrevPage(response.data.has_prev);
@@ -191,7 +191,10 @@ function StoryDetails() {
           </p>
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
           <p>{`Time: ${formatDate()}`}</p>
-          <p>{`content: ${story.content}`}</p>
+          <div
+              className="story-content"
+              dangerouslySetInnerHTML={{ __html: story.content }}
+            />
           <p>{`tags: ${story.story_tags}`}</p>
           <div>
           <span>{numLikes} </span>
@@ -215,7 +218,7 @@ function StoryDetails() {
             </svg>
           </button>
         </div>
-          <div>
+          {/* <div>
             {photos &&
               photos
                 .slice((currentPhotoPage - 1) * PHOTOS_PER_PAGE, currentPhotoPage * PHOTOS_PER_PAGE)
@@ -249,7 +252,7 @@ function StoryDetails() {
                 Next
               </button>
             )}
-          </div>
+          </div> */}
           {story.location_ids.length > 0 && (
               <>
                 <div style={{ width: '100%', height: '400px' }}>
