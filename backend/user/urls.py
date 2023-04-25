@@ -27,8 +27,10 @@ urlpatterns = [
     path('storyPhoto/<int:story_id>',StoryPhotosView.as_view()),
     path('storyPhotoOps/<int:story_id>',AddStoryPhotoView.as_view()),
     path('storyPhotoOps/<int:story_id>/<int:photo_id>',AddStoryPhotoView.as_view()),
-    path('searchUser', SearchUserView.as_view(), name='search'),
-    path('storySearch', SearchStoryView.as_view(), name='search'),
+    path('searchUser', SearchUserView.as_view()),
+    path('storySearch', SearchStoryView.as_view()),
+    path("passwordReset", SendPasswordResetEmail.as_view()),
+    path("passwordReset/<token>/<uidb64>", ResetPassword.as_view()),
     
     # path('photoForStory/<int:story_id>', StoryPhotoAPIView.as_view()),
 ]

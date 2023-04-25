@@ -2,6 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group,Permission
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
+from datetime import timedelta
+from django.utils import timezone
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name="e-mail", max_length = 100, unique = True)
@@ -77,3 +80,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.comment_author} on {self.story.title}'
+    
+class PasswordResetToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.token = get_random_string(length=64)
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)

@@ -15,6 +15,8 @@ import { LoadScriptNext } from "@react-google-maps/api";
 import SearchUserResults from './SearchUserResults';
 import StorySearch from './StorySearch';
 import mainPhoto from './assets/images/homePage4.png'
+import ResetPasswordRequest from './ResetPasswordRequest';
+import ResetPasswordMain from './ResetPasswordMain';
 
 function App() {
 
@@ -93,6 +95,8 @@ function App() {
                 } />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
+            <Route path="/resetPassword" element={<ResetPasswordRequest />} />
+            <Route path="/resetPassword/:uidb64/:token" element={<ResetPasswordMain />} />
             </>
             )}
             

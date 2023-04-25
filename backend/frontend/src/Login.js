@@ -16,8 +16,6 @@ function Login({ onLoginSuccess }) {
       username: username,
       password: password
     },{ withCredentials: true }).then(response => {
-      // TODO: handle success response
-
       if (response.status == 200) {
         toast.success('Login successful!');
         onLoginSuccess();
@@ -26,10 +24,15 @@ function Login({ onLoginSuccess }) {
           toast.error('Invalid email or password');
         }
     }).catch(error => {
-      console.log(error.response.data);
-      // TODO: handle error response
+      console.log(error);
+      if (error.response) {
+        console.log(error.response.data);
+      } else {
+        console.log('Request failed:', error.message);
+      }
     });
   }
+  
 
   return (
     <div className="container">

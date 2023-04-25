@@ -1,23 +1,29 @@
 # views.py
-from rest_framework import status, views, generics
+from rest_framework import status, views
 from rest_framework.response import Response
-from .serializers import *
-from .models import User,Story,Comment
-from .authentication import *
-from .functions import auth_check
-from django.shortcuts import get_object_or_404
-import json
 from rest_framework.permissions import AllowAny
-from django.http import HttpResponse, HttpResponseNotFound
-import os,base64
+from rest_framework.exceptions import PermissionDenied 
+from django.http import HttpResponse
+from django.contrib.auth.tokens import default_token_generator
 from django.core.paginator import Paginator
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
-from math import ceil,cos, radians
-from rest_framework.exceptions import PermissionDenied 
+from django.core.mail import send_mail
 from django.db.models import Q
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from .sendEmail import send_password_reset_email
+import json
+import os,base64
+from math import ceil,cos, radians
 from datetime import datetime, timedelta
-
+from .serializers import *
+from .models import User,Story,Comment
+from .authentication import *
+from .models import PasswordResetToken
 
 
 
@@ -314,6 +320,7 @@ class StoryAuthorView(views.APIView):
         user_id_new = decode_refresh_token(cookie_value)
 
         if user_id:
+            print("caneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer")
             user = get_object_or_404(User, pk=user_id)
             stories = Story.objects.filter(author=user_id).order_by('-creation_date')
         else:
@@ -587,3 +594,43 @@ class SearchStoryView(views.APIView):
             'prev_page': page.previous_page_number() if page.has_previous() else None,
             'total_pages': total_pages,
         }, status=status.HTTP_200_OK)
+    
+
+class SendPasswordResetEmail(views.APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        user = User.objects.filter(email=email).first()
+        if user:
+            token, created = PasswordResetToken.objects.get_or_create(user=user)
+            token.created_at = timezone.now()
+            token.save()
+
+            user_id = str(user.pk)
+            encoded_user_id = base64.b64encode(user_id.encode('utf-8'))
+            # Send password reset email
+            subject = "Password Reset Request"
+            #uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token_str = default_token_generator.make_token(user)
+            email_body = (
+                f"To reset your password, click the link below:\n\n"
+                f"http://localhost:3000/resetPassword/{token_str}/{encoded_user_id}\n"
+            )
+            send_mail(subject, email_body, "noreply@yourapp.com", [email])
+
+        return Response({"detail": "Password reset email sent."}, status=status.HTTP_200_OK)
+
+class ResetPassword(views.APIView):
+    def post(self, request, token, uidb64):
+        print("caner")
+        print(uidb64)
+
+        user_id = base64.b64decode(uidb64.decode('utf-8'))
+        user = User.objects.get(pk=user_id)
+
+        if default_token_generator.check_token(user, token):
+            new_password = request.data.get("new_password")
+            user.set_password(new_password)
+            user.save()
+            return Response({"detail": "Password has been reset."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
