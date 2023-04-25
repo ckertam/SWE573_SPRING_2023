@@ -20,9 +20,12 @@ const UserProfile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchUserDetails();
-    fetchProfilePhoto();
-    fetchUserStories();
+    const fetchData = async () => {
+      const fetchedUser = await fetchUserDetails(); 
+      fetchProfilePhoto();
+      fetchUserStories(fetchedUser); 
+    };
+    fetchData();
   }, [currentPage]);
 
   const fetchUserDetails = async () => {
@@ -34,6 +37,7 @@ const UserProfile = () => {
       });
       setUser(response.data);
       setUpdatedBio(response.data.biography);
+      return response.data;
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
@@ -60,11 +64,13 @@ const UserProfile = () => {
     
   };
 
-  const fetchUserStories = async () => {
+  const fetchUserStories = async (user) => {
+    
     try {
-      const response = await axios.get(`http://localhost:8000/user/userStories?page=${currentPage}&size=5`, {
+      const response = await axios.get(`http://localhost:8000/user/userStories/${user.id}?page=${currentPage}&size=2`, {
         withCredentials: true,
       });
+      console.log(response.data)
       setStories(response.data.stories);
       setHasNextPage(response.data.has_next);
       setHasPrevPage(response.data.has_prev);
