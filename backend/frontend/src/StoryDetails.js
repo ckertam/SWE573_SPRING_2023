@@ -9,7 +9,7 @@ import withAuth from './authCheck';
 
 function StoryDetails() {
   const [story, setStory] = useState(null);
-  const [author, setAuthor] = useState(null);
+  //const [author, setAuthor] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
@@ -50,8 +50,8 @@ function StoryDetails() {
         const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`, { withCredentials: true });
         setStory(response.data);
         setNumLikes(response.data.likes.length);
-        const authorResponse = await axios.get(`http://localhost:8000/user/usernamesbyId?user_ids[]=${response.data.author}`);
-        setAuthor(authorResponse.data);
+        // const authorResponse = await axios.get(`http://localhost:8000/user/usernamesbyId?user_ids[]=${response.data.author}`);
+        // setAuthor(authorResponse.data);
   
         // Check if the user has liked the story and set the 'liked' state accordingly
         if (userId && response.data.likes.includes(userId)) {
@@ -180,13 +180,13 @@ function StoryDetails() {
 
   return (
     <div>
-      {story && author ? (
+      {story ? (
         <>
           <h1>{story.title}</h1>
           <p>
             author:{' '}
             <span className={styles.author} onClick={() => handleUserClick(story.author)}>
-              {author}
+              {story.author_username}
             </span>
           </p>
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>

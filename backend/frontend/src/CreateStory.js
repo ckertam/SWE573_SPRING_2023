@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
 import withAuth from './authCheck';
-import styles from './CreateStory.module.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
