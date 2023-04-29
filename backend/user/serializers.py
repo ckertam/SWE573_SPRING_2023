@@ -94,24 +94,26 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ['id', 'author','author_username', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year', 'date','creation_date','start_date','end_date','likes']
+        fields = ['id', 'author','author_username', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year','start_year','end_year', 'date','creation_date','start_date','end_date','likes']
 
     def validate(self, attrs):
         date_type = attrs.get('date_type')
+        start_year = attrs.get('start_year')
+        end_year = attrs.get('end_year')
         season_name = attrs.get('season_name')
         year = attrs.get('year')
         date = attrs.get('date')
         start_date = attrs.get('start_date')
         end_date = attrs.get('end_date')
 
-        if date_type == Story.SEASON and (year is not None or date is not None):
-            raise serializers.ValidationError("Only 'season_name' field should be set when 'date_type' is 'season'.")
-        elif date_type == Story.DECADE and (season_name is not None or date is not None or start_date is not None or end_date is not None):
+        if date_type == Story.YEAR_INTERVAL and (year is not None or date is not None or start_date is not None or end_date is not None):
+            raise serializers.ValidationError("Only 'year_interval' field should be set when 'date_type' is 'year_interval'.")
+        elif date_type == Story.DECADE and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'decade'.")
-        elif date_type == Story.NORMAL_DATE and (season_name is not None or year is not None or start_date is not None or end_date is not None):
+        elif date_type == Story.NORMAL_DATE and (start_year is not None or end_year is not None or year is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
-        elif date_type == Story.INTERVAL_DATE and (season_name is not None or year is not None or date is not None):
-            raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
+        elif date_type == Story.INTERVAL_DATE and (start_year is not None or end_year is not None or year is not None or date is not None):
+            raise serializers.ValidationError("Only 'date_interval' field should be set when 'date_type' is 'date_interval'.")
 
         return attrs
 

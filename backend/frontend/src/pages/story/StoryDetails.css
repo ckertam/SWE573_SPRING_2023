@@ -1,14 +1,14 @@
-.author {
+.authorStoryDetail {
     cursor: pointer;
     color: #007bff;
     transition: color 0.2s ease-in-out;
   }
   
-  .author:hover {
+  .authorStoryDetail:hover {
     color: #0056b3;
   }
   
-  .author:active {
+  .authorStoryDetail:active {
     transform: scale(0.95);
   }
   
@@ -68,4 +68,20 @@
     transform: scale(3.1)
   }
   
-  
+  .storydetail-story-map {
+    width: '400px';
+    height: '400px';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+  }
+
+  .story-content {
+    width: '400px';
+    height: '400px';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }

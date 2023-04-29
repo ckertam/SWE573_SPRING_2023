@@ -2,7 +2,7 @@ import React, { useState,useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
-import styles from './StorySearch.module.css'
+import styles from './StorySearch.css'
 import withAuth from '../../authCheck';
 
 
@@ -15,6 +15,8 @@ const StorySearch = () => {
   const [pageSize, setPageSize] = useState(10);
   const [timeType, setTimeType] = useState('');
   const [seasonName, setSeasonName] = useState('');
+  const [startYear, setStartYear] = useState(null);
+  const [endYear, setEndYear] = useState(null);
   const [year, setYear] = useState('');
   const [date, setDate] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -41,11 +43,11 @@ const StorySearch = () => {
     let timeValueObj = {};
 
     switch (timeType) {
-        case 'season':
-        timeValueObj = { seasonName };
+        case 'year':
+        timeValueObj = { year, seasonName };
         break;
-        case 'decade':
-        timeValueObj = { year };
+        case 'year_interval':
+        timeValueObj = { startYear, endYear, seasonName };
         break;
         case 'normal_date':
         timeValueObj = { date };
@@ -84,19 +86,7 @@ const StorySearch = () => {
 
   const renderTimeInput = () => {
     switch (timeType) {
-      case 'season':
-        return (
-          <>
-            <label htmlFor="seasonName">Season Name:</label>
-            <input
-              type="text"
-              id="seasonName"
-              value={seasonName}
-              onChange={(e) => setSeasonName(e.target.value)}
-            />
-          </>
-        );
-      case 'decade':
+      case 'year':
         return (
           <>
             <label htmlFor="year">Year:</label>
@@ -105,6 +95,42 @@ const StorySearch = () => {
               id="year"
               value={year}
               onChange={(e) => setYear(e.target.value)}
+            />
+            <br />
+            <label htmlFor="seasonName">Season: </label>
+            <input
+              type="text"
+              id="seasonName"
+              value={seasonName}
+              onChange={(e) => setSeasonName(e.target.value)}
+            />
+          </>
+        );
+      case 'year_interval':
+        return (
+          <>
+            <label htmlFor="startYear">Start Year:</label>
+            <input
+              type="number"
+              id="startYear"
+              value={startYear}
+              onChange={(e) => setStartYear(e.target.value)}
+            />
+            <br />
+            <label htmlFor="endDate">End Year:</label>
+            <input
+              type="number"
+              id="endYear"
+              value={endYear}
+              onChange={(e) => setEndYear(e.target.value)}
+            />
+            <br />
+            <label htmlFor="seasonName">Season: </label>
+            <input
+              type="text"
+              id="seasonName"
+              value={seasonName}
+              onChange={(e) => setSeasonName(e.target.value)}
             />
           </>
         );
@@ -201,7 +227,7 @@ const StorySearch = () => {
   return (
     <div>
       <h2>Story Search</h2>
-    <form onSubmit={handleSearch}>
+      <form onSubmit={handleSearch}>
       <label htmlFor="titleSearch">Search by title:</label>
       <input
         type="text"
@@ -218,23 +244,22 @@ const StorySearch = () => {
         onChange={(e) => setAuthorSearch(e.target.value)}
       />
       <br />
-      <div className="form-group">
+      <div>
         <label htmlFor="timeType">Date Type:</label>
         <select
-          className="form-control"
           id="timeType"
           value={timeType}
           onChange={(e) => setTimeType(e.target.value)}
         >
           <option value="">Select time type</option>
-          <option value="season">Season</option>
-          <option value="decade">Decade</option>
+          <option value="year">Year</option>
+          <option value="year_interval">Year Interval</option>
           <option value="normal_date">Normal Date</option>
           <option value="interval_date">Interval Date</option>
         </select>
       </div>
       {renderTimeInput()}
-        <div className="form-group">
+        <div>
             <label>Location:</label>
             <Autocomplete
             onLoad={(autocomplete) => {
@@ -242,15 +267,16 @@ const StorySearch = () => {
             }}
             onPlaceChanged={handleLocationSelect}
             >
-            <input type="text" className="form-control" />
+            <input type="text"/>
             </Autocomplete>
         </div>
-            <div className="form-group">
+            <div className='search-story-map' >
                 <GoogleMap
-                id="search-map"
+                
                 mapContainerStyle={{
-                    width: '100%',
-                    height: '400px',
+                  width: '400px',
+                  height: '400px',
+                  
                 }}
                 zoom={2}
                 center={markerPosition}
@@ -265,21 +291,21 @@ const StorySearch = () => {
                 )}
                 </GoogleMap>
             </div>
-      <button type="submit">Search</button>
-    </form>  
+            <button type="submit">Search</button>
+            </form> 
       {stories.length > 0 && (
         <>
           <h3>Search Results:</h3>
           <ul>
             {stories.map((story) => (
               <li key={story.id}>
-                <h4 className={styles.title} onClick={() => handleStoryClick(story.id)}>
+                <h4 className='title-search' onClick={() => handleStoryClick(story.id)}>
                   {story.title}
                 </h4>
                 <p>
                   author:{' '}
                   <span
-                    className={styles.author}
+                    className='author-search'
                     onClick={() => handleUserClick(story.author)}
                   >
                     {story.author_username}
@@ -291,7 +317,7 @@ const StorySearch = () => {
         </>
       )}
       {totalPages > 1 && (
-        <div className={styles.pagination}>
+        <div className='pagination-search'>
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}

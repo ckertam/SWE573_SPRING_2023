@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams,useNavigate  } from 'react-router-dom';
-import styles from './StoryDetails.module.css';
+import './StoryDetails.css';
 import { GoogleMap, LoadScriptNext, Marker } from '@react-google-maps/api';
 import withAuth from '../../authCheck';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
@@ -133,16 +133,19 @@ function StoryDetails() {
   const formatDate = () => {
     // format the date based on the date_type of the story
     switch (story.date_type) {
-      case 'season':
-        return story.season_name;
       case 'decade':
-        return `${story.year}s`;
+        return `Year: ${story.year}`;
+      case 'year_interval':
+        const startYear = story.start_year;
+        const endYear = story.end_year;
+        return `Start Year: ${startYear} \n End Year: ${endYear}`;
       case 'normal_date':
-        return new Date(story.date).toLocaleString();
+        const date = new Date(story.date).toLocaleString()
+        return `Date: ${startYear}`;
       case 'interval_date':
         const startDate = new Date(story.start_date).toLocaleDateString();
         const endDate = new Date(story.end_date).toLocaleDateString();
-        return `${startDate} to ${endDate}`;
+        return `Start Date: ${startDate} \n End Date: ${endDate}`;
       default:
         return '';
     }
@@ -188,68 +191,37 @@ function StoryDetails() {
       {story ? (
         <>
           <h1>{story.title}</h1>
+          
           <p>
             author:{' '}
-            <span className={styles.author} onClick={() => handleUserClick(story.author)}>
+            <span className='authorStoryDetail' onClick={() => handleUserClick(story.author)}>
               {story.author_username}
             </span>
           </p>
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
-          <p>{`Time: ${formatDate()}`}</p>
+          <p>{`${formatDate()}`}</p>
+          <p>{story.season_name && `Season: ${(story.season_name)} `}</p>
           <div
               className="story-content"
               dangerouslySetInnerHTML={{ __html: story.content }}
             />
           <p>{`tags: ${story.story_tags}`}</p>
-          <div className='author'> 
-          <span>{numLikes} </span>
+          <div> 
           <button
             onClick={handleLikeDislike}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
              <Heart isClick={liked} onClick={() => setLiked(!liked)}/>
           </button>
+          <br/>
+          <span>{numLikes} </span>
         </div>
-          {/* <div>
-            {photos &&
-              photos
-                .slice((currentPhotoPage - 1) * PHOTOS_PER_PAGE, currentPhotoPage * PHOTOS_PER_PAGE)
-                .map((photo, index) => (
-                  <img
-                    key={index}
-                    src={photo}
-                    alt={`story photo ${index}`}
-                    width={100}
-                    height={100}
-                  />
-                ))}
-          </div>
-          <div className={styles.pagination}>
-          {hasPrevPhotoPage && (
-              <button onClick={() => handlePhotoPageChange(currentPhotoPage - 1)} disabled={!hasPrevPhotoPage}>
-                Previous
-              </button>
-            )}
-            {Array.from({ length: totalPhotoPages }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPhotoPage ? styles.active : null}
-                onClick={() => handlePhotoPageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            {hasNextPhotoPage && (
-              <button onClick={() => handlePhotoPageChange(currentPhotoPage + 1)} disabled={!hasNextPhotoPage}>
-                Next
-              </button>
-            )}
-          </div> */}
+
           {story.location_ids.length > 0 && (
               <>
-                <div style={{ width: '100%', height: '400px' }}>
+                <div className='storydetail-story-map'>
                   <GoogleMap
-                    mapContainerStyle={{ height: '100%', width: '100%' }}
+                    mapContainerStyle={{ height: '400px', width: '400px' }}
                     zoom={12}
                     center={{
                       lat: parseFloat(story.location_ids[0].latitude),
@@ -269,7 +241,7 @@ function StoryDetails() {
                 <p>{comment.text}</p>
               </div>
             ))}
-          <div className={styles.pagination}>
+          <div className= 'pagination'>
           {hasPrevPage && (
               <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
                 Previous
@@ -278,7 +250,7 @@ function StoryDetails() {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index}
-                className={index + 1 === currentPage ? styles.active : null}
+                className={index + 1 === currentPage ? 'active' : null}
                 onClick={() => handlePageChange(index + 1)}
               >
                 {index + 1}
@@ -304,6 +276,7 @@ function StoryDetails() {
         />
         <button onClick={handleCommentSubmit}>Submit</button>
       </div>
+    
     </div>
   );
 }

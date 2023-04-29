@@ -29,13 +29,13 @@ class PhotoForStory(models.Model):
 
 
 class Story(models.Model):
-    SEASON = 'season'
+    YEAR_INTERVAL = 'year_interval'
     DECADE = 'decade'
     NORMAL_DATE = 'normal_date'
     INTERVAL_DATE = 'interval_date'
     
     DATE_TYPES = [
-        (SEASON, 'Season'),
+        (YEAR_INTERVAL, 'Year Interval'),
         (DECADE, 'Decade'),
         (NORMAL_DATE, 'Normal Date'),
         (INTERVAL_DATE, 'Interval Date'),
@@ -50,6 +50,8 @@ class Story(models.Model):
     location_ids = models.ManyToManyField(Location, blank=True)
     date_type = models.CharField(max_length=20, choices=DATE_TYPES, default=NORMAL_DATE)
     season_name = models.CharField(max_length=255, null=True, blank=True)
+    start_year = models.PositiveIntegerField(null=True, blank=True)
+    end_year = models.PositiveIntegerField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
@@ -60,7 +62,7 @@ class Story(models.Model):
     def clean(self):
         # Custom validation to ensure only one date field is set
 
-        date_fields = [self.season_name, self.year, self.date, self.end_date]
+        date_fields = [self.start_year, self.year, self.date, self.end_date]
         print(date_fields)
         if date_fields.count(None) != 3:
             raise ValidationError("Only one type of date field should be set.")

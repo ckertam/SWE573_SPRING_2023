@@ -31,6 +31,7 @@ urlpatterns = [
     path('storySearch', SearchStoryView.as_view()),
     path("passwordReset", SendPasswordResetEmail.as_view()),
     path("passwordReset/<token>/<uidb64>", ResetPassword.as_view()),
+    path("storyDelete", StoryDeleteAPIView.as_view()),
     
     # path('photoForStory/<int:story_id>', StoryPhotoAPIView.as_view()),
 ]

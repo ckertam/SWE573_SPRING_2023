@@ -318,7 +318,7 @@ class StoryAuthorView(views.APIView):
         user_id_new = decode_refresh_token(cookie_value)
 
         if user_id:
-            print("caneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer")
+            #print("caneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer")
             user = get_object_or_404(User, pk=user_id)
             stories = Story.objects.filter(author=user_id).order_by('-creation_date')
         else:
@@ -540,13 +540,19 @@ class SearchStoryView(views.APIView):
         if time_type and time_value:
 
             time_value = json.loads(time_value)
-
+            print(time_value)
             if time_type == 'season':
                 time_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=time_value)
-            elif time_type == 'decade':
+            elif time_type == 'year':
                 time_value = time_value["year"]
-                query_filter &= Q(year__gte=time_value) ##here can be change for now it shows greater than of that year
+                season_value = time_value["seasonName"]
+                query_filter &= Q(season_name__icontains=season_value, year__e=time_value)
+            elif time_type == 'year_interval':
+                start_year = time_value["startYear"]
+                end_year = time_value["endYear"]
+                season_value = time_value["seasonName"]
+                query_filter &= Q(season_name__icontains=season_value, start_year__gte=start_year, end_year__lte=end_year) ##here can be change for now it shows greater than of that year
             elif time_type == 'normal_date':
                 given_date = datetime.strptime(time_value["date"], "%Y-%m-%d").date()
 
@@ -633,3 +639,13 @@ class ResetPassword(views.APIView):
         else:
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
         
+class StoryDeleteAPIView(views.APIView):
+    def delete(self, request):
+        queryset = Story.objects.filter(
+            Q(season_name__isnull=False) & (
+                Q(year__isnull=True) & Q(end_date__isnull=True) &
+                Q(start_date__isnull=True) & Q(end_year__isnull=True) & Q(start_year__isnull=True)
+            )
+        )
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
