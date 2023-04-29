@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+//import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -35,22 +38,27 @@ function Login({ onLoginSuccess }) {
 
   return (
     <div className="container">
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}> */}
         <h1>Login</h1>
+
         <div className="form-group">
-          <label>Username:</label>
-          <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)} />
+          {/* <label>Username:</label>
+          <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)} /> */}
+          <TextField id="outlined-basic" label="Username" variant="outlined" onChange={(e) => setUsername(e.target.value)} />
         </div>
+        <br/>
         <div className="form-group">
-          <label>Password:</label>
-          <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} />
+        <TextField id="outlined-basic" label="Password" variant="outlined" type="password" onChange={(e) => setPassword(e.target.value)} />
         </div>
-        <button type="submit" className="btn btn-primary">Login</button>
+        <br/>
+        <Button variant="contained" onClick={handleSubmit}>Login</Button>
+        
+        {/* <button type="submit" className="btn btn-primary">Login</button> */}
         <ToastContainer position="bottom-right" autoClose={5000} />
         <div className="forgot-password-link">
           <Link to="/resetPassword">Forgot my password</Link>
         </div>
-      </form>
+      {/* </form> */}
     </div>
   );
 }

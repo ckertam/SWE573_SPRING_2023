@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import Button from '@mui/material/Button';
 
 function LogoutButton() {
   const handleLogoutClick = async () => {
@@ -19,9 +20,7 @@ function LogoutButton() {
   }
 
   return (
-    <button onClick={handleLogoutClick} style={{ position: 'absolute', top: '10px', right: '10px' }}>
-      Logout
-    </button>
+    <Button variant="contained" color="error" style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={handleLogoutClick}>Logout</Button>
   );
 }
 

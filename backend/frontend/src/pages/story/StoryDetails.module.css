@@ -44,7 +44,7 @@
     color: white;
   }
 
-  .heart-button {
+  .heart-clicked {
     display: inline-block;
     vertical-align: middle;
     padding: 0;
@@ -52,15 +52,20 @@
     outline: none;
   }
   
-  .heart-clicked {
-    animation: click-animation 0.15s ease;
-  }
-  
-  @keyframes click-animation {
-    0%, 100% {
+  @keyframes grow-up {
+    0% {
       transform: scale(1);
     }
     50% {
       transform: scale(1.3);
     }
+    100% {
+      transform: scale(1);
+    }
   }
+  
+  .heart-clicked:active {
+    transform: scale(3.1)
+  }
+  
+  

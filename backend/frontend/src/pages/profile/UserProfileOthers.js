@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams,useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 import withAuth from './authCheck';
+import UserProfile from './UserProfile';
 
 const UserProfileOthers = () => {
   const [user, setUser] = useState(null);
@@ -14,6 +15,7 @@ const UserProfileOthers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [isMe, setIsMe] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const { id } = useParams();
 
@@ -39,9 +41,9 @@ const UserProfileOthers = () => {
         const currentUser = await getCurrentUser();
 
         if (Number(id) === currentUser) {
-          console.log("caner")
-          navigate('/user-profile');
-          return;
+          setIsMe(true);
+          //navigate('/user-profile');
+          //return;
         }
 
 
@@ -154,53 +156,57 @@ const UserProfileOthers = () => {
 
   return (
     <div>
-      <h1>{user.username}'s Profile</h1>
-      {profilePhotoUrl && (
-        <img
-          src={profilePhotoUrl}
-          alt={`${user.username}'s profile`}
-          className="profile-photo"
-        />
-      )}
-      {/* <p>ID: {user.id}</p>
-      <p>Email: {user.email}</p> */}
-      <p>Biography: {user.biography}</p>
-      <p>Followers: {followerCount !== null ? followerCount : 'Loading...'}</p>
-      <button onClick={handleFollowClick}>
-        {isFollowing ? 'Unfollow' : 'Follow'}
-      </button>
-      <h2>Stories</h2>
-      {loading ? (
-        <p>Loading stories...</p>
-      ) : stories.length === 0 ? (
-        <p>No stories found.</p>
-      ) : (
-        <div>
-          {stories.map(story => (
-            <div key={story.id}>
-              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
-              <p>Creation Date: {new Date(story.creation_date).toLocaleString()}</p>
+      {isMe? <UserProfile/>:
+          <div>
+          <h1>{user.username}'s Profile</h1>
+          {profilePhotoUrl && (
+            <img
+              src={profilePhotoUrl}
+              alt={`${user.username}'s profile`}
+              className="profile-photo"
+            />
+          )}
+          {/* <p>ID: {user.id}</p>
+          <p>Email: {user.email}</p> */}
+          <p>Biography: {user.biography}</p>
+          <p>Followers: {followerCount !== null ? followerCount : 'Loading...'}</p>
+          <button onClick={handleFollowClick}>
+            {isFollowing ? 'Unfollow' : 'Follow'}
+          </button>
+          <h2>Stories</h2>
+          {loading ? (
+            <p>Loading stories...</p>
+          ) : stories.length === 0 ? (
+            <p>No stories found.</p>
+          ) : (
+            <div>
+              {stories.map(story => (
+                <div key={story.id}>
+                  <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+                  <p>Creation Date: {new Date(story.creation_date).toLocaleString()}</p>
+                </div>
+              ))}
+              <div className="pagination">
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    className={index + 1 === currentPage ? 'active' : null}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+                  Next
+                </button>
+              </div>
             </div>
-          ))}
-          <div className="pagination">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPage ? 'active' : null}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-              Next
-            </button>
-          </div>
+          )}
         </div>
-      )}
+        }
     </div>
   );
 };

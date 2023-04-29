@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Autocomplete, Marker } from '@react-google-maps/api';
-import withAuth from './authCheck';
+import withAuth from '../../authCheck';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -20,13 +20,33 @@ function CreateStory() {
   const [end_date, setEndDate] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
-
   const navigate = useNavigate();
-
-
   const autocompleteRef = useRef(null);
-
   const inputRef = useRef(null);  
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image", "video"]
+    ]
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "video"
+  ];
 
   const handleLocationSelect = () => {
     if (!autocompleteRef.current) {
@@ -138,7 +158,7 @@ function CreateStory() {
           </div>
           <div className="form-group">
           <label htmlFor="content">Content:</label>
-          <ReactQuill value={content} onChange={setContent}/>
+          <ReactQuill modules={modules} formats={formats} theme="snow" value={content} onChange={setContent}/>
           </div>
           <div className="form-group">
           <label>Story Tags:</label>
