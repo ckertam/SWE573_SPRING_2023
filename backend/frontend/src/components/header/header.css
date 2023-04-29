@@ -85,3 +85,24 @@
     justify-content: center;
   }
   
+  .custombg {
+
+    box-sizing: border-box;
+    
+    position: relative;
+    width: 985px;
+    height: 1011px;
+    
+    background: #363636;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    }
+    
+
+  body {
+    background-image: url('https://media.tenor.com/NH_dhrT0B6MAAAAC/white-aesthetic.gif');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+  }

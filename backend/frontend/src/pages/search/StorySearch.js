@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 import styles from './StorySearch.module.css'
-import withAuth from './authCheck';
+import withAuth from '../../authCheck';
 
 
 const StorySearch = () => {

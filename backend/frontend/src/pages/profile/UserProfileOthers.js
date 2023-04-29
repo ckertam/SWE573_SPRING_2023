@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams,useNavigate } from 'react-router-dom';
 import './UserProfile.css';
-import withAuth from './authCheck';
+import withAuth from '../../authCheck';
 import UserProfile from './UserProfile';
 
 const UserProfileOthers = () => {

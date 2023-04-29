@@ -2,21 +2,20 @@ import React, { useState, useEffect, useRef} from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './header.css';
 import axios from 'axios';
-import Register from '../../Register';
+import Register from '../../pages/landing/Register';
 import Login from '../../pages/landing/Login';
 import CreateStory from '../../pages/story/CreateStory';
-import StoriesByFollowingsUsers from '../../StoriesbyFollowingUsers';
+import StoriesByFollowingsUsers from '../../pages/homepage/StoriesbyFollowingUsers';
 import StoryDetails from '../../pages/story/StoryDetails';
-import LogoutButton from '../../Logout';
-import UserProfile from '../../UserProfile';
-import UserProfileOthers from '../../UserProfileOthers';
-import AddPhotoToStory from '../../AddPhotoToStory';
+import LogoutButton from '../../pages/landing/Logout';
+import UserProfile from '../../pages/profile/UserProfile';
+import UserProfileOthers from '../../pages/profile/UserProfileOthers';
 import { LoadScriptNext } from "@react-google-maps/api";
-import SearchUserResults from '../../SearchUserResults';
-import StorySearch from '../../StorySearch';
+import SearchUserResults from '../../pages/search/SearchUserResults';
+import StorySearch from '../../pages/search/StorySearch';
 import mainPhoto from '../../assets/images/homePage4.png'
-import ResetPasswordRequest from '../../ResetPasswordRequest';
-import ResetPasswordMain from '../../ResetPasswordMain';
+import ResetPasswordRequest from '../../pages/landing/ResetPasswordRequest';
+import ResetPasswordMain from '../../pages/landing/ResetPasswordMain';
 
 function Header() {
 
@@ -104,7 +103,6 @@ function Header() {
               <>
             <Route path="/homepage" element={<StoriesByFollowingsUsers />} />
             <Route path="/create-story" element={<CreateStory />} />
-            <Route path="/create-story/add-photo/:story_id" element={<AddPhotoToStory />} />
             <Route path="/story/:id" element={<StoryDetails />} />
             <Route path="/user-profile" element={<UserProfile />} />
             <Route path="/user-profile/:id" element={<UserProfileOthers />} />
