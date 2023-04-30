@@ -4,6 +4,8 @@ from user.models import User,Story,Location,Comment,PhotoForStory,Content #, Dat
 from rest_framework.fields import CharField
 from .functions import *
 import urllib.parse
+from django.contrib.auth.hashers import make_password
+
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -16,17 +18,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-
-
         if validated_data["password"] != validated_data["password_again"]:
-            print("caner")
-            raise serializers.ValidationError("Passwords do no match!")
-            
-        user_data = self.Meta.model(**validated_data)
-
+            raise serializers.ValidationError("Passwords do not match!")
         
+        validated_data["password"] = make_password(validated_data["password"])
+        del validated_data["password_again"]
 
-        #user_data.set_password(password)
+        user_data = self.Meta.model(**validated_data)
         user_data.save()
         return user_data
 

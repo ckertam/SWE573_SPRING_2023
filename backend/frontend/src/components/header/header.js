@@ -32,7 +32,6 @@ function Header() {
         setIsLoggedIn(false);
       }
     } catch (error) {
-      console.log(error);
       setIsLoggedIn(false);
     }
   };

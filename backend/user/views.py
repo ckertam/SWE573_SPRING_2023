@@ -22,7 +22,7 @@ from .serializers import *
 from .models import User,Story,Comment
 from .authentication import *
 from .models import PasswordResetToken
-
+from django.contrib.auth import authenticate
 
 
 class UserRegistrationView(views.APIView):
@@ -54,25 +54,19 @@ class UserLoginView(views.APIView):
         password = body.get('password')
 
         # Use the username and password to authenticate the user
-        user = User.objects.filter(username=username).first()
+        user = authenticate(request, username=username, password=password)
 
-        
-        if user is None :
-            return Response({'error': 'Invalid username'}, status=400)
-        if user.password != password:
-            return Response({'error': 'Wrong password'}, status=400)
-        
+        if user is None:
+            return Response({'error': 'Invalid username or password'}, status=400)
 
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
-        print(access_token)
-        print(refresh_token)
         response = Response()
 
-        response.set_cookie(key='refreshToken', value = refresh_token, httponly= True)
+        response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
         response.data = {
             'access': access_token,
-            'refresh' : refresh_token
+            'refresh': refresh_token
         }
 
         return response
