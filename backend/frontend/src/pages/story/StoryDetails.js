@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams,useNavigate  } from 'react-router-dom';
 import './StoryDetails.css';
-import { GoogleMap, LoadScriptNext, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import withAuth from '../../authCheck';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import Heart from "react-animated-heart";
-
-
-
-
+import CommentSection from './CommentSection';
 
 function StoryDetails() {
   const [story, setStory] = useState(null);
@@ -17,31 +13,19 @@ function StoryDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasPrevPage, setHasPrevPage] = useState(false);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [totalPages, setTotalPages] = useState(0);
-  // const [photos, setPhotos] = useState([]);
-  // const [currentPhotoPage, setCurrentPhotoPage] = useState(1);
-  // const [hasPrevPhotoPage, setHasPrevPhotoPage] = useState(false);
-  // const [hasNextPhotoPage, setHasNextPhotoPage] = useState(false);
-  // const [totalPhotoPages, setTotalPhotoPages] = useState(0);
   const [numLikes, setNumLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [isClick, setClick] = useState(false);
-
-
-
+  const [username, setUsername] = useState(null);
 
   // const PHOTOS_PER_PAGE = 3;
   const COMMENTS_PER_PAGE = 5;
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/user', { withCredentials: true });
-      setUserId(response.data);
+      const response = await axios.get('http://localhost:8000/user/userDetails', { withCredentials: true });
+      setUserId(response.data.id);
+      setUsername(response.data.username);
     } catch (error) {
       console.log(error);
     }
@@ -55,10 +39,6 @@ function StoryDetails() {
         const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`, { withCredentials: true });
         setStory(response.data);
         setNumLikes(response.data.likes.length);
-        // const authorResponse = await axios.get(`http://localhost:8000/user/usernamesbyId?user_ids[]=${response.data.author}`);
-        // setAuthor(authorResponse.data);
-  
-        // Check if the user has liked the story and set the 'liked' state accordingly
         if (userId && response.data.likes.includes(userId)) {
           setLiked(true);
         } else {
@@ -71,64 +51,11 @@ function StoryDetails() {
     fetchStory();
   }, [userId]);
 
-  // useEffect(() => {
-  //   const fetchPhotos = async () => {
-  //     try {
-  //       const response = await axios.get(`http://localhost:8000/user/storyPhoto/${id}?page=${currentPhotoPage}&size=3`, { withCredentials: true });
-  //       setPhotos(response.data.photos.map(item => item.photo_for_story));
-  //       setHasNextPhotoPage(response.data.has_next);
-  //       setHasPrevPhotoPage(response.data.has_prev);
-  //       setTotalPhotoPages(response.data.total_pages);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   fetchPhotos(currentPhotoPage);
-  // }, [id, currentPhotoPage]);
-
-  // const handlePhotoPageChange = (newPage) => {
-  //   if (newPage >= 1 && newPage <= totalPhotoPages) {
-  //     setCurrentPhotoPage(newPage);
-  //   }
-  // };
-
-  const fetchComments = async (page) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=${COMMENTS_PER_PAGE}`);
-      setComments(response.data.comments);
-      setHasNextPage(response.data.has_next);
-      setHasPrevPage(response.data.has_prev);
-      setTotalPages(response.data.total_pages);
-      console.log(totalPages)
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchComments(currentPage);
-  }, [currentPage]);
-
   const handleUserClick = async (id) => {
     navigate(`/user-profile/${id}`);
   };
 
-  const handleCommentSubmit = async () => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/user/comment/${id}`,
-        { text: commentText },
-        { withCredentials: true }
-      );
-      setCommentText('');
-      // if the new comment is on the current page, add it to the comments list
-      if (currentPage === 1 && comments.length < 3) {
-        setComments([...comments, response.data]);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   const formatDate = () => {
     // format the date based on the date_type of the story
@@ -151,11 +78,7 @@ function StoryDetails() {
     }
   };
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
+
 
   function StoryMarkers({ locations }) {
     const markers = locations.map((location, index) => (
@@ -186,8 +109,9 @@ function StoryDetails() {
     }
   };
 
+
   return (
-    <div>
+    <div className="story-details-wrapper">
       {story ? (
         <>
           <h1>{story.title}</h1>
@@ -201,10 +125,12 @@ function StoryDetails() {
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
           <p>{`${formatDate()}`}</p>
           <p>{story.season_name && `Season: ${(story.season_name)} `}</p>
+          <div className='story-content-container'>
           <div
               className="story-content"
               dangerouslySetInnerHTML={{ __html: story.content }}
             />
+            </div>
           <p>{`tags: ${story.story_tags}`}</p>
           <div> 
           <button
@@ -233,50 +159,13 @@ function StoryDetails() {
                 </div>
               </>
             )}
-          <h2>Comments</h2>
-          {comments &&
-            comments.map((comment) => (
-              <div key={comment.id}>
-                <p>{`Comment by ${comment.comment_author} on ${new Date(comment.date).toLocaleString()}`}</p>
-                <p>{comment.text}</p>
-              </div>
-            ))}
-          <div className= 'pagination'>
-          {hasPrevPage && (
-              <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-                Previous
-              </button>
-            )}
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPage ? 'active' : null}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            {hasNextPage && (
-              <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-                Next
-              </button>
-            )}
-          </div>
+          <CommentSection storyId={id} comments={comments} setComments={setComments} />
         </>
       ) : (
         <p>Loading...</p>
       )}
-      <div>
-        <label htmlFor="comment">Add a comment:</label>
-        <textarea
-          id="comment"
-          name="comment"
-          value={commentText}
-          onChange={(event) => setCommentText(event.target.value)}
-        />
-        <button onClick={handleCommentSubmit}>Submit</button>
-      </div>
-    
+
+        
     </div>
   );
 }

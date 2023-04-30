@@ -77,11 +77,17 @@
     flex: 1;
   }
 
-  .story-content {
-    width: '400px';
-    height: '400px';
+  .story-content-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
+    justify-content: center;
+  }
+
+  .story-content {
+    text-align: center;
+    display: inline-block;
+  }
+
+  .story-details-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
   }

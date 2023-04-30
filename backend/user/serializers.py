@@ -150,13 +150,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentGetSerializer(serializers.ModelSerializer):
     comment_author = serializers.SerializerMethodField()
+    comment_author_id = serializers.SerializerMethodField()
 
     def get_comment_author(self, obj):
         return obj.comment_author.username
+    def get_comment_author_id(self, obj):
+        return obj.comment_author.id
 
     class Meta:
         model = Comment
-        fields = ['id', 'comment_author', 'story', 'text', 'date']
+        fields = ['id', 'comment_author','comment_author_id', 'story', 'text', 'date']
 
 class ContentSerializer(serializers.ModelSerializer):
     class Meta:
