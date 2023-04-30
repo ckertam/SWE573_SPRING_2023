@@ -21,10 +21,12 @@ const StorySearch = () => {
   const [date, setDate] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
   const [locationSearch, setLocationSearch] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [markerPosition, setMarkerPosition] = useState(mapCenter);
+  const [radiusDiff, setRadiusDiff] = useState(25);
+  const [dateDiff, setDateDiff] = useState(2);
+
   const autocompleteRef = useRef(null);
 
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ const StorySearch = () => {
     }
     
     try {
-      const response = await axios.get('http://localhost:8000/user/storySearch', {
+      const response = await axios.get(`http://localhost:8000/user/storySearch`, {
         params: {
             title: titleSearch,
             author: authorSearch,
@@ -69,12 +71,15 @@ const StorySearch = () => {
             time_type: timeType,
             time_value: JSON.stringify(timeValueObj),
             location: JSON.stringify(locationSearch),
+            radius_diff: radiusDiff,
+            date_diff: dateDiff,
           },
         withCredentials: true,
       });
       setStories(response.data.stories);
       setTotalPages(response.data.total_pages);
       setCurrentPage(pageNumber);
+      console.log(radiusDiff)
     } catch (error) {
       console.error('Error fetching stories:', error);
     } 
@@ -223,6 +228,24 @@ const StorySearch = () => {
     });
   };
 
+  const renderDateDiffInput = () => {
+    if (timeType === 'normal_date' || timeType === 'interval_date') {
+      return (
+        <>
+          <br/>
+          <label htmlFor="dateDiff">Date Difference (days):</label>
+          <input
+            type="number"
+            id="dateDiff"
+            value={dateDiff}
+            onChange={(e) => setDateDiff(e.target.value)}
+          />
+        </>
+      );
+    }
+    return null;
+  };
+
 
   return (
     <div>
@@ -259,6 +282,7 @@ const StorySearch = () => {
         </select>
       </div>
       {renderTimeInput()}
+      {renderDateDiffInput()}
         <div>
             <label>Location:</label>
             <Autocomplete
@@ -269,6 +293,13 @@ const StorySearch = () => {
             >
             <input type="text"/>
             </Autocomplete>
+            <label htmlFor="radiusDiff">Radius Difference (miles):</label>
+          <input
+            type="number"
+            id="radiusDiff"
+            value={radiusDiff}
+            onChange={(e) => setRadiusDiff(e.target.value)}
+          />
         </div>
             <div className='search-story-map' >
                 <GoogleMap

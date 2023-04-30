@@ -519,7 +519,7 @@ class SearchUserView(views.APIView):
         }, status=status.HTTP_200_OK)
     
 class SearchStoryView(views.APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs ):
         cookie_value = request.COOKIES['refreshToken']
         user_id = decode_refresh_token(cookie_value)
         user = get_object_or_404(User, pk=user_id)
@@ -529,18 +529,20 @@ class SearchStoryView(views.APIView):
         time_type = request.query_params.get('time_type', '')
         time_value = request.query_params.get('time_value', '')
         location = request.query_params.get('location', '')
+        radius_diff = float(request.query_params.get('radius_diff', ''))
+        date_diff = float(request.query_params.get('date_diff', ''))
 
         query_filter = Q()
         if title_search:
             query_filter &= Q(title__icontains=title_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
-        print(time_type)
-        print(time_value)
+        # print(time_type)
+        # print(time_value)
         if time_type and time_value:
 
             time_value = json.loads(time_value)
-            print(time_value)
+            # print(time_value)
             if time_type == 'season':
                 time_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=time_value)
@@ -557,8 +559,8 @@ class SearchStoryView(views.APIView):
                 given_date = datetime.strptime(time_value["date"], "%Y-%m-%d").date()
 
                 # Calculate the date range
-                start_date = given_date - timedelta(days=2)
-                end_date = given_date + timedelta(days=2)
+                start_date = given_date - timedelta(days=date_diff)
+                end_date = given_date + timedelta(days=date_diff)
                 query_filter &= Q(date__range=(start_date, end_date)) ##I can change the date to get 2 dates for interval on normal_date too
                 #time_value = time_value["date"]
                 ##query_filter &= Q(date=time_value)
@@ -571,7 +573,7 @@ class SearchStoryView(views.APIView):
             location = json.loads(location)
             lat = location['latitude']
             lng = location['longitude']
-            radius = 25  # radius set for near search
+            radius = radius_diff  # radius set for near search
 
             query_filter &= Q(
                 location_ids__latitude__range=(lat - radius / 110.574, lat + radius / 110.574),
