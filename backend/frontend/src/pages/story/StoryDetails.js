@@ -67,8 +67,8 @@ function StoryDetails() {
         const endYear = story.end_year;
         return `Start Year: ${startYear} \n End Year: ${endYear}`;
       case 'normal_date':
-        const date = new Date(story.date).toLocaleString()
-        return `Date: ${startYear}`;
+        const date = new Date(story.date).toLocaleDateString()
+        return `Date: ${date}`;
       case 'interval_date':
         const startDate = new Date(story.start_date).toLocaleDateString();
         const endDate = new Date(story.end_date).toLocaleDateString();

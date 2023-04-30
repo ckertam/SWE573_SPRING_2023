@@ -556,7 +556,8 @@ class SearchStoryView(views.APIView):
                 season_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=season_value, start_year__gte=start_year, end_year__lte=end_year) ##here can be change for now it shows greater than of that year
             elif time_type == 'normal_date':
-                given_date = datetime.strptime(time_value["date"], "%Y-%m-%d").date()
+
+                given_date = datetime.strptime(time_value["date"], "%Y-%m-%d")
 
                 # Calculate the date range
                 start_date = given_date - timedelta(days=date_diff)

@@ -246,6 +246,9 @@ const StorySearch = () => {
     return null;
   };
 
+  const formatRadiusLabel = (value) => {
+    return `${value} km`;
+  };
 
   return (
     <div>
@@ -293,10 +296,14 @@ const StorySearch = () => {
             >
             <input type="text"/>
             </Autocomplete>
-            <label htmlFor="radiusDiff">Radius Difference (miles):</label>
+            <label htmlFor="radiusDiff">
+          Radius Difference: {formatRadiusLabel(radiusDiff)}
+        </label>
           <input
-            type="number"
+            type="range"
             id="radiusDiff"
+            min="1"
+            max="250"
             value={radiusDiff}
             onChange={(e) => setRadiusDiff(e.target.value)}
           />
