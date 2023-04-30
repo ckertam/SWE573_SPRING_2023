@@ -6,6 +6,8 @@ import { GoogleMap, Marker } from '@react-google-maps/api';
 import withAuth from '../../authCheck';
 import Heart from "react-animated-heart";
 import CommentSection from './CommentSection';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function StoryDetails() {
   const [story, setStory] = useState(null);
@@ -125,11 +127,14 @@ function StoryDetails() {
           <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
           <p>{`${formatDate()}`}</p>
           <p>{story.season_name && `Season: ${(story.season_name)} `}</p>
-          <div className='story-content-container'>
-          <div
+          <div className='quill-container'>
+          
+            <ReactQuill
               className="story-content"
-              dangerouslySetInnerHTML={{ __html: story.content }}
-            />
+              value={story.content}
+              readOnly={true}
+              modules={{ toolbar: false }}
+             />
             </div>
           <p>{`tags: ${story.story_tags}`}</p>
           <div> 
