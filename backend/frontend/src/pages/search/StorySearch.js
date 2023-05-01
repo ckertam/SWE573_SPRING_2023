@@ -103,12 +103,17 @@ const StorySearch = () => {
             />
             <br />
             <label htmlFor="seasonName">Season: </label>
-            <input
-              type="text"
+            <select
               id="seasonName"
               value={seasonName}
               onChange={(e) => setSeasonName(e.target.value)}
-            />
+            >
+              <option value="">Select season</option>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Fall">Fall</option>
+              <option value="Winter">Winter</option>
+            </select>
           </>
         );
       case 'year_interval':
@@ -122,7 +127,7 @@ const StorySearch = () => {
               onChange={(e) => setStartYear(e.target.value)}
             />
             <br />
-            <label htmlFor="endDate">End Year:</label>
+            <label htmlFor="endYear">End Year:</label>
             <input
               type="number"
               id="endYear"
@@ -131,18 +136,23 @@ const StorySearch = () => {
             />
             <br />
             <label htmlFor="seasonName">Season: </label>
-            <input
-              type="text"
+            <select
               id="seasonName"
               value={seasonName}
               onChange={(e) => setSeasonName(e.target.value)}
-            />
+            >
+              <option value="">Select season</option>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Fall">Fall</option>
+              <option value="Winter">Winter</option>
+            </select>
           </>
         );
       case 'normal_date':
         return (
           <>
-            <label htmlFor="normal_date">Date:</label>
+            <label htmlFor="date">Date:</label>
             <input
               type="date"
               id="date"

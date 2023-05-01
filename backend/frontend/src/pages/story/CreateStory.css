@@ -43,8 +43,32 @@
   height: 200px; 
   resize: both; 
   overflow: auto; 
+  resize: none;
+  margin: 0 auto;
+  border-radius: '4px';
 }
 
 .ql-editor {
   background-color: white;
+}
+
+.date-type {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.date-box {
+  width: 200px;
+}
+
+.long-boxes {
+  width: 500px;
+  border-radius: '20px'
+}
+
+.long-boxes .MuiOutlinedInput-root {
+  background-color: white; 
 }

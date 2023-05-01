@@ -6,6 +6,7 @@ import withAuth from '../../authCheck';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './CreateStory.css'
+import {TextField, Select, MenuItem, InputLabel, FormControl, Button, List, ListItem, ListItemText } from '@mui/material';
 
 function CreateStory() {
 
@@ -23,6 +24,7 @@ function CreateStory() {
   const [end_date, setEndDate] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
+  const [firstClick, setFirstClick] = useState(true);
   const navigate = useNavigate();
   const autocompleteRef = useRef(null);
   const inputRef = useRef(null);
@@ -128,6 +130,19 @@ function CreateStory() {
   //   }
   // };
 
+  const handleContentChange = (value) => {
+    setContent(value);
+  };
+
+  const handleEditorClick = () => {
+    if (firstClick) {
+      setContent('');
+      setFirstClick(false);
+    }
+  };
+
+  const editorPlaceholder = firstClick ? 'Enter your content here' : '';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -161,81 +176,178 @@ function CreateStory() {
       <div className="create-story-content">
           <form>
             {/* <div className="form-group"> */}
-              <label>Title:</label>
-              <input type="text" onChange={(e) => setTitle(e.target.value)} />
+              <TextField
+                  variant="outlined"
+                  placeholder="Title"
+                  className='long-boxes'
+                  label="Title" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
             {/* </div> */}
             {/* <div className="form-group"> */}
             <br/>
-              <label>Content:</label>
+            <br/>
               <ReactQuill
                 modules={modules}
                 formats={formats}
                 className="custom-input"
                 theme="snow"
                 value={content}
+                onClick={handleEditorClick}
+                placeholder={editorPlaceholder}
                 onChange={setContent}
               />
             {/* </div> */}
             <br/>
             <br/>
             <div>
-              <label>Story Tags:</label>
-              <input type="text" onChange={(e) => setStoryTags(e.target.value)} />
+              <TextField
+                variant="outlined"
+                placeholder="Enter tags separating with ','"
+                className='long-boxes'
+                label="Tags"
+                value={story_tags}
+                onChange={(e) => setStoryTags(e.target.value)}
+              />
             </div>
-            <div >
-              <label>Date Type:</label>
-              <select  onChange={(e) => setDateType(e.target.value)}>
-                <option value="">Select a date type</option>
-                <option value="decade">Year</option>
-                <option value="year_interval">Interval Year</option>
-                <option value="normal_date">Normal Date</option>
-                <option value="interval_date">Interval Date</option>
-              </select>
+            <div style={{ marginTop: '1rem' }}>
+            <FormControl variant="outlined" > 
+                <InputLabel id="date-type-label">Date Type</InputLabel>
+                <Select
+                  labelId="date-type-label"
+                  id="date-type"
+                  style={{width: "200px"}}
+                  value={date_type}
+                  onChange={(e) => setDateType(e.target.value)}
+                  label="Date Type"
+                >
+                  <MenuItem value="">Select a date type</MenuItem>
+                  <MenuItem value="decade">Year</MenuItem>
+                  <MenuItem value="year_interval">Interval Year</MenuItem>
+                  <MenuItem value="normal_date">Normal Date</MenuItem>
+                  <MenuItem value="interval_date">Interval Date</MenuItem>
+                </Select>
+              </FormControl>
             </div>
             {date_type === 'decade' &&
-              <div >
-                <label>Year:</label>
-                <input type="text"  onChange={(e) => setYear(e.target.value)} />
-                <label>Season:</label>
-                <input type="text"  onChange={(e) => setSeasonName(e.target.value)} />
-              </div>
-            }
-            {date_type === 'year_interval' &&
-              <div >
-                <label>StartYear:</label>
-                <input type="number"  onChange={(e) => setStartYear(e.target.value)} />
-                <label>EndYear:</label>
-                <input type="number"  onChange={(e) => setEndYear(e.target.value)} />
-                <label>Season:</label>
-                <input type="text"  onChange={(e) => setSeasonName(e.target.value)} />
-              </div>
-            }
-            {date_type === 'normal_date' &&
-              <div >
-                <label>Date:</label>
-                <input type="date"  onChange={(e) => setDate(e.target.value)} />
-              </div>
-            }
-            {date_type === 'interval_date' &&
-              <div >
-                <label>Start Date:</label>
-                <input type="date"  onChange={(e) => setStartDate(e.target.value)} />
-                <label>End Date:</label>
-                <input type="date"  onChange={(e) => setEndDate(e.target.value)} />
-              </div>
-            }
-
+            <div className='date-type'>
+              <TextField
+                id="year"
+                className='date-box'
+                label="Year"
+                variant="outlined"
+                type="text"
+                onChange={(e) => setYear(e.target.value)}
+              />
+              <FormControl variant="outlined">
+                <InputLabel id="season-label">Season</InputLabel>
+                <Select
+                  labelId="season-label"
+                  id="season"
+                  className='date-box'
+                  value={season_name}
+                  onChange={(e) => setSeasonName(e.target.value)}
+                  label="Season"
+                >
+                  <MenuItem value="">Select a season</MenuItem>
+                  <MenuItem value="Spring">Spring</MenuItem>
+                  <MenuItem value="Summer">Summer</MenuItem>
+                  <MenuItem value="Fall">Fall</MenuItem>
+                  <MenuItem value="Winter">Winter</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                    }
+          {date_type === 'year_interval' &&
+            <div className='date-type'>
+              <TextField
+                id="start-year"
+                className='date-box'
+                label="Start Year"
+                variant="outlined"
+                type="number"
+                onChange={(e) => setStartYear(e.target.value)}
+              />
+              <TextField
+                id="end-year"
+                className='date-box'
+                label="End Year"
+                variant="outlined"
+                type="number"
+                onChange={(e) => setEndYear(e.target.value)}
+              />
+              <FormControl variant="outlined">
+                <InputLabel id="season-label">Season</InputLabel>
+                <Select
+                  labelId="season-label"
+                  id="season"
+                  className='date-box'
+                  value={season_name}
+                  onChange={(e) => setSeasonName(e.target.value)}
+                  label="Season"
+                >
+                  <MenuItem value="">Select a season</MenuItem>
+                  <MenuItem value="Spring">Spring</MenuItem>
+                  <MenuItem value="Summer">Summer</MenuItem>
+                  <MenuItem value="Fall">Fall</MenuItem>
+                  <MenuItem value="Winter">Winter</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          }
+          {date_type === 'normal_date' &&
+            <div className='date-type'>
+              <TextField
+                className='date-box'
+                label="Date"
+                variant="outlined"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+          }
+            {date_type === 'interval_date' && (
+            <div className='date-type'>
+              <TextField
+                className='date-box'
+                type="date"
+                label="Start Date"
+                variant="outlined"
+                // style={{ background: '#FFFFFF' }}
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <TextField
+                className='date-box'
+                type="date"
+                label="End Date"
+                variant="outlined"
+                // style={{ background: '#FFFFFF' }}
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          )}
           
-          <label>Locations:</label>
-          <Autocomplete
+          <Autocomplete 
+            className='date-type'
             onLoad={(autocomplete) => {
               autocompleteRef.current = autocomplete;
             }}
             onPlaceChanged={handleLocationSelect}
           >
-            <input type="text" className="form-control" ref={inputRef} />
+            <TextField 
+              className='date-box'
+              type="search" 
+              label="Locations" 
+              variant="outlined" 
+              inputRef={inputRef} 
+            />
           </Autocomplete>
-          <button type="submit" className="btn btn-primary middle" onClick={handleSubmit}>Create Story</button>
+          <br/>
+          <Button variant="contained" onClick={handleSubmit} className="btn btn-primary middle">Create Story</Button>
           </form>
           </div>
           
@@ -258,15 +370,15 @@ function CreateStory() {
             </GoogleMap>
             <div className="location-list-wrapper">
             <div className="location-list-container">
-            <ol>
-              {location_ids.map((loc, index) => (
-                <div key={index}>
-                  <li>{loc.name || `${loc.latitude}, ${loc.longitude}`}</li>
-                  <button type="button" onClick={() => handleLocationRemove(index)}>Remove</button>
-                </div>
-              ))}
-            </ol>
-          </div>
+              <List>
+                {location_ids.map((loc, index) => (
+                  <ListItem key={index}>
+                    <ListItemText style={{ marginRight: "16px" }}>{loc.name || `${loc.latitude}, ${loc.longitude}`}</ListItemText>
+                    <Button variant="contained" size="small" color="primary" onClick={() => handleLocationRemove(index)}>Remove</Button>
+                  </ListItem>
+                ))}
+              </List>
+            </div>
           </div>
           </div>
           

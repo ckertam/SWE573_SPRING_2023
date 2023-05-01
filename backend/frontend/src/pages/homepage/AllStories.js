@@ -58,7 +58,7 @@ function StoriesByFollowingsUsers() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const storiesResponse = await axios.get(`http://localhost:8000/user/userStories?page=${currentPage}&size=10`, { withCredentials: true });
+        const storiesResponse = await axios.get(`http://localhost:8000/user/allStories?page=${currentPage}&size=10`, { withCredentials: true });
         setStories(storiesResponse.data.stories);
         setHasNextPage(storiesResponse.data.has_next);
         setHasPrevPage(storiesResponse.data.has_prev);
