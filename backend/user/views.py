@@ -348,6 +348,41 @@ class StoryAuthorView(views.APIView):
             'total_pages': total_pages,
         }, status=status.HTTP_200_OK)
     
+class AllStoryView(views.APIView):
+    def get(self, request):
+
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        stories = Story.objects.exclude(Q(author__id=user_id)).order_by('-creation_date')
+
+        print(stories)
+        #print(followed_users)
+        #followed_users_ids = followed_users.values_list('id', flat=True)
+
+        # Get the page number and size
+        page_number = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('size', 3))
+
+        # Paginate the stories
+        
+        paginator = Paginator(stories, page_size)
+        total_pages = ceil(paginator.count / page_size)
+        page = paginator.get_page(page_number)
+
+        serializer = StorySerializer(page, many=True)
+
+        
+        return Response({
+            'stories': serializer.data,
+            'has_next': page.has_next(),
+            'has_prev': page.has_previous(),
+            'next_page': page.next_page_number() if page.has_next() else None,
+            'prev_page': page.previous_page_number() if page.has_previous() else None,
+            'total_pages': total_pages,
+        }, status=status.HTTP_200_OK)
+    
 
 class UsernamesByIDsView(views.APIView):
     def get(self, request):
@@ -447,6 +482,9 @@ class UserPhotoView(views.APIView):
             cookie_value = request.COOKIES['refreshToken']
             user_id = decode_refresh_token(cookie_value)
             user = get_object_or_404(User, pk=user_id)
+
+        if not user.profile_photo:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = UserPhotoSerializer(user)
         file_ext = os.path.splitext(user.profile_photo.name)[-1].lower()

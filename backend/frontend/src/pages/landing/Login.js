@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 //import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import './landing.css';
 
 function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -51,10 +52,11 @@ function Login({ onLoginSuccess }) {
         <TextField id="outlined-basic" label="Password" variant="outlined" type="password" onChange={(e) => setPassword(e.target.value)} />
         </div>
         <br/>
-        <Button variant="contained" onClick={handleSubmit}>Login</Button>
+        <Button variant="contained" onClick={handleSubmit} className="login-button">Login</Button>
         
         {/* <button type="submit" className="btn btn-primary">Login</button> */}
         <ToastContainer position="bottom-right" autoClose={5000} />
+        <br/>
         <div className="forgot-password-link">
           <Link to="/resetPassword">Forgot my password</Link>
         </div>

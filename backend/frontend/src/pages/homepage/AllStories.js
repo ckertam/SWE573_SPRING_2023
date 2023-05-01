@@ -15,8 +15,6 @@ function StoriesByFollowingsUsers() {
   const [loadingProfilePhotos, setLoadingProfilePhotos] = useState({});
   const [defaultProfilePhoto] = useState('https://i.stack.imgur.com/l60Hf.png'); 
 
-
-  
   const navigate = useNavigate();
 
   const fetchProfilePhoto = async (userId) => {
@@ -56,6 +54,7 @@ function StoriesByFollowingsUsers() {
     }
   };
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -90,7 +89,6 @@ function StoriesByFollowingsUsers() {
     }
   };
 
-  
   const handlePhotoClick = async (userId) => {
     navigate(`/user-profile/${userId}`);
   };

@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import './landing.css';
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -42,26 +45,35 @@ function Register() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}> */}
         <h1>Register</h1>
-        <div className="form-group">
-          <label>Username:</label>
-          <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)} />
+        <div>
+          {/* <label>Username:</label>
+          <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)} /> */}
+          <TextField id="outlined-basic" label="Username" variant="outlined" onChange={(e) => setUsername(e.target.value)} />
         </div>
-        <div className="form-group">
-          <label>Email:</label>
-          <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} />
+        <br/>
+        <div>
+          {/* <label>Email:</label>
+          <input type="email" className="form-control" onChange={(e) => setEmail(e.target.value)} /> */}
+          <TextField id="outlined-basic" label="E-Mail" variant="outlined" onChange={(e) => setEmail(e.target.value)} />
         </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} />
+        <br/>
+        <div>
+          {/* <label>Password:</label>
+          <input type="password" className="form-control" onChange={(e) => setPassword(e.target.value)} /> */}
+          <TextField id="outlined-basic" label="Password" variant="outlined" type='password' onChange={(e) => setPassword(e.target.value)} />
         </div>
-        <div className="form-group">
-          <label>Password Again:</label>
-          <input type="password" className="form-control" onChange={(e) => setPasswordAgain(e.target.value)} />
+        <br/>
+        <div>
+          {/* <label>Password Again:</label>
+          <input type="password" className="form-control" onChange={(e) => setPasswordAgain(e.target.value)} /> */}
+          <TextField id="outlined-basic" label="Password Again" variant="outlined" type='password' onChange={(e) => setPasswordAgain(e.target.value)} />
         </div>
-        <button type="submit" className="btn btn-primary">Register</button>
-      </form>
+        <br/>
+        {/* <button type="submit" className="btn btn-primary">Register</button> */}
+        <Button variant="contained" onClick={handleSubmit} className="register-button" >Register</Button>
+      {/* </form> */}
       <ToastContainer />
     </>
   );

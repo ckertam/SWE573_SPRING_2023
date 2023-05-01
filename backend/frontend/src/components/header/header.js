@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef} from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './header.css';
 import axios from 'axios';
+import UserSearch from './UserSearch';
 import Register from '../../pages/landing/Register';
 import Login from '../../pages/landing/Login';
 import CreateStory from '../../pages/story/CreateStory';
-import StoriesByFollowingsUsers from '../../pages/homepage/StoriesbyFollowingUsers';
+import StoryContainer from '../../pages/homepage/StoryContainer';
 import StoryDetails from '../../pages/story/StoryDetails';
 import LogoutButton from '../../pages/landing/Logout';
 import UserProfile from '../../pages/profile/UserProfile';
@@ -40,44 +41,38 @@ function Header() {
     fetchUserDetails();
   }, []);
 
-
-  // useEffect(() => {
-  //   const loggedInUser = localStorage.getItem('token');
-  //   if (loggedInUser) {
-  //     setIsLoggedIn(true);
-  //   }
-  // }, []);
-  // console.log(isLoggedIn)
-
   return (
     <Router>
       <div className="container">
         <nav className="navbar">
           <div className="navbar-nav">
-          {!isLoggedIn && (
-            <>
-            <Link to="/" className="nav-item nav-link">Home</Link>
-            <Link to="/register" className="nav-item nav-link">Register</Link>
-            <Link to="/login" className="nav-item nav-link">Login</Link>
-            </>
+            {!isLoggedIn && (
+              <>
+                <Link to="/" className="nav-item nav-link">Home</Link>
+                <Link to="/register" className="nav-item nav-link">Register</Link>
+                <Link to="/login" className="nav-item nav-link">Login</Link>
+              </>
             )}
             {isLoggedIn && (
-            <>
-            <Link to="/homepage" className="nav-item nav-link"><img
-                src={mainPhoto}
-                alt="Home Page"
-                style={{ width: '50px', height: '50px' }}
-              /></Link>
-            <Link to="/story_search" className="nav-item nav-link">Search Stories</Link>
-            <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
-            <Link to="/user-profile" className="nav-item nav-link">User Profile</Link>
-            </>
+              <>
+                <Link to="/homepage" className="nav-item nav-link"><img
+                  src={mainPhoto}
+                  alt="Home Page"
+                  style={{ width: '50px', height: '50px' }}
+                /></Link>
+                <Link to="/story_search" className="nav-item nav-link">Search Stories</Link>
+                <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
+                <Link to="/user-profile" className="nav-item nav-link">User Profile</Link>
+                <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <UserSearch />
+                  <LogoutButton />
+                </div>
+                </>
+              </>
             )}
           </div>
         </nav>
-        {isLoggedIn && (
-        <LogoutButton />
-        )}
         <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={['places']}>
           <Routes>
           {!isLoggedIn && (
@@ -100,7 +95,7 @@ function Header() {
             
             {isLoggedIn && (
               <>
-            <Route path="/homepage" element={<StoriesByFollowingsUsers />} />
+            <Route path="/homepage" element={<StoryContainer />} />
             <Route path="/create-story" element={<CreateStory />} />
             <Route path="/story/:id" element={<StoryDetails />} />
             <Route path="/user-profile" element={<UserProfile />} />
