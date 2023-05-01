@@ -94,7 +94,7 @@
   height: '400px';
 }
 
-.custom-input {
+.custom-input-search {
   width: 500px; 
   height: 200px; 
   resize: both; 
@@ -104,7 +104,7 @@
   border-radius: '4px';
 }
 
-.date-type {
+.date-type-search {
   margin-top: 1rem;
   display: flex;
   align-items: center;
@@ -118,22 +118,19 @@
 
 .date-box {
   width: 200px;
-}
-
-.date-box .MuiOutlinedInput-root {
   background-color: white; 
 }
 
-.long-boxes {
+.long-boxes-search {
   width: 200px;
   border-radius: '20px'
 }
 
-.long-boxes .MuiOutlinedInput-root {
+.long-boxes-search .MuiOutlinedInput-root {
   background-color: white; 
 }
 
-.story-box {
+.story-box-search {
   width: 500px;
   height: 55px;
   margin: 0 auto;
@@ -146,7 +143,7 @@
   border-radius: 8px;
 }
 
-.story-author-photo {
+.story-author-photo-search {
   width: 50px;
   height: 50px;
   object-fit: cover;
@@ -155,13 +152,13 @@
   margin-right: 1rem;
 }
 
-.story-details {
+.story-details-search {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.story-title {
+.story-title-search {
   margin-bottom: 0.5rem;
   cursor: pointer;
   text-decoration: none;
@@ -170,13 +167,13 @@
   transition: color 0.2s ease-in-out;
 }
 
-.story-title:hover {
+.story-title-search:hover {
   color: #0056b3;
 }
 
 
 
-.story-author {
+.story-author-search {
   margin-bottom: 10;
   text-align: left;
   font-family: "Comic Sans MS"

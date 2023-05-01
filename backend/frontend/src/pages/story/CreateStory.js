@@ -216,9 +216,9 @@ function CreateStory() {
                 <InputLabel id="date-type-label">Date Type</InputLabel>
                 <Select
                   labelId="date-type-label"
+                  placeholder = "Date Type"
                   id="date-type"
                   className='date-box'
-                  style={{width: "200px"}}
                   value={date_type}
                   onChange={(e) => setDateType(e.target.value)}
                   label="Date Type"

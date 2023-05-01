@@ -94,10 +94,10 @@ const StorySearch = () => {
     switch (timeType) {
       case 'year':
         return (
-          <div className='date-type'>
+          <div className='date-type-search'>
           <TextField
             id="year"
-            className='date-box'
+            className='date-box-search'
             label="Year"
             variant="outlined"
             type="text"
@@ -108,7 +108,7 @@ const StorySearch = () => {
             <Select
               labelId="season-label"
               id="season"
-              className='date-box'
+              className='date-box-search'
               value={seasonName}
               onChange={(e) => setSeasonName(e.target.value)}
               label="Season"
@@ -124,10 +124,10 @@ const StorySearch = () => {
         );
       case 'year_interval':
         return (
-          <div className='date-type'>
+          <div className='date-type-search'>
               <TextField
                 id="start-year"
-                className='date-box'
+                className='date-box-search'
                 label="Start Year"
                 variant="outlined"
                 type="number"
@@ -135,7 +135,7 @@ const StorySearch = () => {
               />
               <TextField
                 id="end-year"
-                className='date-box'
+                className='date-box-search'
                 label="End Year"
                 variant="outlined"
                 type="number"
@@ -146,7 +146,7 @@ const StorySearch = () => {
                 <Select
                   labelId="season-label"
                   id="season"
-                  className='date-box'
+                  className='date-box-search'
                   value={seasonName}
                   onChange={(e) => setSeasonName(e.target.value)}
                   label="Season"
@@ -162,9 +162,9 @@ const StorySearch = () => {
         );
       case 'normal_date':
         return (
-          <div className='date-type'>
+          <div className='date-type-search'>
               <TextField
-                className='date-box'
+                className='date-box-search'
                 label="Date"
                 variant="outlined"
                 type="date"
@@ -175,9 +175,9 @@ const StorySearch = () => {
         );
       case 'interval_date':
         return (
-          <div className='date-type'>
+          <div className='date-type-search'>
               <TextField
-                className='date-box'
+                className='date-box-search'
                 type="date"
                 label="Start Date"
                 variant="outlined"
@@ -186,7 +186,7 @@ const StorySearch = () => {
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <TextField
-                className='date-box'
+                className='date-box-search'
                 type="date"
                 label="End Date"
                 variant="outlined"
@@ -256,9 +256,9 @@ const StorySearch = () => {
   const renderDateDiffInput = () => {
     if (timeType === 'normal_date' || timeType === 'interval_date') {
       return (
-        <div className='date-type'>
+        <div className='date-type-search'>
         <TextField 
-          className='date-box'
+          className='date-box-search'
           variant="outlined"
           label="Date Difference (days):"
           type="number"
@@ -282,7 +282,7 @@ const StorySearch = () => {
       <TextField
         variant="outlined"
         placeholder="Title"
-        className='long-boxes'
+        className='long-boxes-search'
         label="Search by Title" 
         value={titleSearch}
         onChange={(e) => setTitleSearch(e.target.value)}
@@ -292,7 +292,7 @@ const StorySearch = () => {
       <TextField
         variant="outlined"
         placeholder="Author"
-        className='long-boxes'
+        className='long-boxes-search'
         label="Search by Author" 
         value={authorSearch}
         onChange={(e) => setAuthorSearch(e.target.value)}
@@ -303,8 +303,9 @@ const StorySearch = () => {
             <InputLabel id="date-type-label">Date Type</InputLabel>
             <Select
               labelId="date-type-label"
-              id="date-type"
-              className='date-box'
+              placeholder = "Date Type"
+              id="date-type-search"
+              className='date-box-search'
               value={timeType}
               onChange={(e) => setTimeType(e.target.value)}
               label="Date Type"
@@ -321,14 +322,14 @@ const StorySearch = () => {
       {renderDateDiffInput()}
         <div>
             <Autocomplete 
-            className='date-type'
+            className='date-type-search'
             onLoad={(autocomplete) => {
               autocompleteRef.current = autocomplete;
             }}
             onPlaceChanged={handleLocationSelect}
           >
             <TextField 
-              className='date-box'
+              className='date-box-search'
               type="search" 
               label="Location" 
               variant="outlined" 
@@ -378,10 +379,10 @@ const StorySearch = () => {
     <h3>Search Results:</h3>
     <div>
       {stories.map(story => (
-          <div key={story.id} className="story-box">
-            <div className="story-details">
-              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
-              <p className="story-author">by {story.author_username || 'Unknown'}</p>
+          <div key={story.id} className="story-box-search">
+            <div className="story-details-search">
+              <h3 className="story-title-search" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+              <p className="story-author-search">by {story.author_username || 'Unknown'}</p>
             </div>
           </div>
         ))}
