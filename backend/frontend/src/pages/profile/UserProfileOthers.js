@@ -5,7 +5,7 @@ import './UserProfile.css';
 import withAuth from '../../authCheck';
 import UserProfile from './UserProfile';
 import './UserProfileOthers.css';
-import { Button } from '@mui/material';
+import { Button, Paper } from '@mui/material';
 
 
 const UserProfileOthers = () => {
@@ -171,8 +171,14 @@ const UserProfileOthers = () => {
           )}
           {/* <p>ID: {user.id}</p>
           <p>Email: {user.email}</p> */}
-          <p>Biography: {user.biography}</p>
-          <p>Followers: {followerCount !== null ? followerCount : 'Loading...'}</p>
+          <Paper elevation={3} className="custom-bio">
+            <strong>Biography</strong>
+            <p>{user.biography}</p>
+            </Paper>          
+          <Paper elevation={3} className="custom-followers">
+            <strong>Followers</strong>
+            <p>{followerCount !== null ? followerCount : 'Loading...'}</p>
+          </Paper>
           <Button variant="contained" onClick={handleFollowClick}>
             {isFollowing ? 'Unfollow' : 'Follow'}
           </Button>

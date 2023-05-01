@@ -46,3 +46,24 @@
     text-align: left;
     font-family: "Comic Sans MS"
   }
+
+  .custom-bio {
+    padding: spacing(2);
+    margin: 'auto';
+    width: fit-content;
+    padding: 0 30px;
+    text-align: 'center';
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  .custom-followers {
+    padding: spacing(2);
+    margin: 'auto';
+    max-width: 100px;
+    text-align: 'center';
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }

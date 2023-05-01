@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 import withAuth from '../../authCheck';
-import { Button } from '@mui/material';
+import { TextField, Button, Paper } from '@mui/material';
 
 
 const UserProfile = () => {
@@ -167,6 +167,7 @@ const UserProfile = () => {
           onChange={handleProfilePhotoChange}
         />
       </div>
+      <br/>
       <div>
         <button 
         type="button"
@@ -178,17 +179,41 @@ const UserProfile = () => {
       
       {isEditingBio ? (
           <div>
-            <input value={updatedBio} onChange={(e) => setUpdatedBio(e.target.value)} />
-            <button type="button" onClick={handleProfileBioChange}>Save</button>
-            <button type="button" onClick={() => setIsEditingBio(false)}>Cancel</button>
-          </div>
+          <div className='edit-box'>
+            <TextField 
+            value={updatedBio} 
+            onChange={(e) => setUpdatedBio(e.target.value)} 
+            multiline={true}
+            rowsMax={100}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
+                setUpdatedBio((prev) => prev + '\n');
+              }
+            }}
+            InputProps={{ className: 'edit-box' }}
+            />
+            </div>  
+            <div className='edit-buttons'>
+            <Button variant="contained" color='success' type="button" onClick={handleProfileBioChange}>Save</Button>
+            <Button variant="contained" type="button" onClick={() => setIsEditingBio(false)}>Cancel</Button>
+            </div> 
+          </div> 
         ) : (
           <div>
-            <p>Biography: {user.biography}</p>
+            <br/>
+            <Paper elevation={3} className="custom-bio">
+            <strong>Biography</strong>
+            <p>{user.biography.split('\n').map((line, index) => <span key={index}>{line}<br/></span>)}</p>
+            </Paper>
             <Button variant="contained" type="button" onClick={() => setIsEditingBio(true)}>Edit</Button>
           </div>
         )}
-      <p>Followers: {user.followers.length}</p>
+        <br/>
+      <Paper elevation={3} className="custom-followers">
+            <strong>Followers</strong>
+            <p>{user.followers.length !== null ? user.followers.length : 'Loading...'}</p>
+          </Paper>
 
       <h2>Stories</h2>
       {loading ? (
