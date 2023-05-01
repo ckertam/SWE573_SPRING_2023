@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 import styles from './StorySearch.css'
 import withAuth from '../../authCheck';
+import {TextField, Select, MenuItem, InputLabel, FormControl,Slider, Button,List, ListItem, ListItemText } from '@mui/material';
 
 
 const StorySearch = () => {
@@ -93,93 +94,107 @@ const StorySearch = () => {
     switch (timeType) {
       case 'year':
         return (
-          <>
-            <label htmlFor="year">Year:</label>
-            <input
-              type="number"
-              id="year"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-            />
-            <br />
-            <label htmlFor="seasonName">Season: </label>
-            <select
-              id="seasonName"
+          <div className='date-type'>
+          <TextField
+            id="year"
+            className='date-box'
+            label="Year"
+            variant="outlined"
+            type="text"
+            onChange={(e) => setYear(e.target.value)}
+          />
+          <FormControl variant="outlined">
+            <InputLabel id="season-label">Season</InputLabel>
+            <Select
+              labelId="season-label"
+              id="season"
+              className='date-box'
               value={seasonName}
               onChange={(e) => setSeasonName(e.target.value)}
+              label="Season"
             >
-              <option value="">Select season</option>
-              <option value="Spring">Spring</option>
-              <option value="Summer">Summer</option>
-              <option value="Fall">Fall</option>
-              <option value="Winter">Winter</option>
-            </select>
-          </>
+              <MenuItem value="">Select a season</MenuItem>
+              <MenuItem value="Spring">Spring</MenuItem>
+              <MenuItem value="Summer">Summer</MenuItem>
+              <MenuItem value="Fall">Fall</MenuItem>
+              <MenuItem value="Winter">Winter</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
         );
       case 'year_interval':
         return (
-          <>
-            <label htmlFor="startYear">Start Year:</label>
-            <input
-              type="number"
-              id="startYear"
-              value={startYear}
-              onChange={(e) => setStartYear(e.target.value)}
-            />
-            <br />
-            <label htmlFor="endYear">End Year:</label>
-            <input
-              type="number"
-              id="endYear"
-              value={endYear}
-              onChange={(e) => setEndYear(e.target.value)}
-            />
-            <br />
-            <label htmlFor="seasonName">Season: </label>
-            <select
-              id="seasonName"
-              value={seasonName}
-              onChange={(e) => setSeasonName(e.target.value)}
-            >
-              <option value="">Select season</option>
-              <option value="Spring">Spring</option>
-              <option value="Summer">Summer</option>
-              <option value="Fall">Fall</option>
-              <option value="Winter">Winter</option>
-            </select>
-          </>
+          <div className='date-type'>
+              <TextField
+                id="start-year"
+                className='date-box'
+                label="Start Year"
+                variant="outlined"
+                type="number"
+                onChange={(e) => setStartYear(e.target.value)}
+              />
+              <TextField
+                id="end-year"
+                className='date-box'
+                label="End Year"
+                variant="outlined"
+                type="number"
+                onChange={(e) => setEndYear(e.target.value)}
+              />
+              <FormControl variant="outlined">
+                <InputLabel id="season-label">Season</InputLabel>
+                <Select
+                  labelId="season-label"
+                  id="season"
+                  className='date-box'
+                  value={seasonName}
+                  onChange={(e) => setSeasonName(e.target.value)}
+                  label="Season"
+                >
+                  <MenuItem value="">Select a season</MenuItem>
+                  <MenuItem value="Spring">Spring</MenuItem>
+                  <MenuItem value="Summer">Summer</MenuItem>
+                  <MenuItem value="Fall">Fall</MenuItem>
+                  <MenuItem value="Winter">Winter</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
         );
       case 'normal_date':
         return (
-          <>
-            <label htmlFor="date">Date:</label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </>
+          <div className='date-type'>
+              <TextField
+                className='date-box'
+                label="Date"
+                variant="outlined"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
         );
       case 'interval_date':
         return (
-          <>
-            <label htmlFor="startDate">Start Date:</label>
-            <input
-              type="date"
-              id="startDate"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <br />
-            <label htmlFor="endDate">End Date:</label>
-            <input
-              type="date"
-              id="endDate"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </>
+          <div className='date-type'>
+              <TextField
+                className='date-box'
+                type="date"
+                label="Start Date"
+                variant="outlined"
+                // style={{ background: '#FFFFFF' }}
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <TextField
+                className='date-box'
+                type="date"
+                label="End Date"
+                variant="outlined"
+                // style={{ background: '#FFFFFF' }}
+                InputLabelProps={{ shrink: true }}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
         );
       default:
         return null;
@@ -241,16 +256,16 @@ const StorySearch = () => {
   const renderDateDiffInput = () => {
     if (timeType === 'normal_date' || timeType === 'interval_date') {
       return (
-        <>
-          <br/>
-          <label htmlFor="dateDiff">Date Difference (days):</label>
-          <input
-            type="number"
-            id="dateDiff"
-            value={dateDiff}
-            onChange={(e) => setDateDiff(e.target.value)}
-          />
-        </>
+        <div className='date-type'>
+        <TextField 
+          className='date-box'
+          variant="outlined"
+          label="Date Difference (days):"
+          type="number"
+          value={dateDiff}
+          onChange={(e) => setDateDiff(e.target.value)}
+        />
+        </div>
       );
     }
     return null;
@@ -263,61 +278,77 @@ const StorySearch = () => {
   return (
     <div>
       <h2>Story Search</h2>
-      <form onSubmit={handleSearch}>
-      <label htmlFor="titleSearch">Search by title:</label>
-      <input
-        type="text"
-        id="titleSearch"
+      <form onSubmit={handleSearch}  >
+      <TextField
+        variant="outlined"
+        placeholder="Title"
+        className='long-boxes'
+        label="Search by Title" 
         value={titleSearch}
         onChange={(e) => setTitleSearch(e.target.value)}
       />
       <br />
-      <label htmlFor="authorSearch">Search by author username:</label>
-      <input
-        type="text"
-        id="authorSearch"
+      <br />
+      <TextField
+        variant="outlined"
+        placeholder="Author"
+        className='long-boxes'
+        label="Search by Author" 
         value={authorSearch}
         onChange={(e) => setAuthorSearch(e.target.value)}
       />
       <br />
-      <div>
-        <label htmlFor="timeType">Date Type:</label>
-        <select
-          id="timeType"
-          value={timeType}
-          onChange={(e) => setTimeType(e.target.value)}
-        >
-          <option value="">Select time type</option>
-          <option value="year">Year</option>
-          <option value="year_interval">Year Interval</option>
-          <option value="normal_date">Normal Date</option>
-          <option value="interval_date">Interval Date</option>
-        </select>
-      </div>
+      <div style={{ marginTop: '1rem' }}>
+        <FormControl variant="outlined" > 
+            <InputLabel id="date-type-label">Date Type</InputLabel>
+            <Select
+              labelId="date-type-label"
+              id="date-type"
+              className='date-box'
+              value={timeType}
+              onChange={(e) => setTimeType(e.target.value)}
+              label="Date Type"
+            >
+              <MenuItem value="">Select a date type</MenuItem>
+              <MenuItem value="year">Year</MenuItem>
+              <MenuItem value="year_interval">Interval Year</MenuItem>
+              <MenuItem value="normal_date">Normal Date</MenuItem>
+              <MenuItem value="interval_date">Interval Date</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
       {renderTimeInput()}
       {renderDateDiffInput()}
         <div>
-            <label>Location:</label>
-            <Autocomplete
+            <Autocomplete 
+            className='date-type'
             onLoad={(autocomplete) => {
-                autocompleteRef.current = autocomplete;
+              autocompleteRef.current = autocomplete;
             }}
             onPlaceChanged={handleLocationSelect}
-            >
-            <input type="text"/>
-            </Autocomplete>
-            <label htmlFor="radiusDiff">
-          Radius Difference: {formatRadiusLabel(radiusDiff)}
-        </label>
-          <input
-            type="range"
-            id="radiusDiff"
-            min="1"
-            max="250"
-            value={radiusDiff}
-            onChange={(e) => setRadiusDiff(e.target.value)}
-          />
+          >
+            <TextField 
+              className='date-box'
+              type="search" 
+              label="Location" 
+              variant="outlined" 
+            />
+          </Autocomplete>
+          <br/>
+            <FormControl>
+            <InputLabel id="radiusDiff-label" style={{ marginTop: "8px" }}>Radius Difference in KM</InputLabel>
+            <Slider
+              aria-label="Radius Difference"
+              value={radiusDiff}
+              onChange={(e, value) => setRadiusDiff(value)}
+              min={1}
+              max={250}
+              valueLabelDisplay="auto"
+              style={{ width: "200px" }}
+            />
+          </FormControl>
         </div>
+        <br/>
             <div className='search-story-map' >
                 <GoogleMap
                 
@@ -339,48 +370,35 @@ const StorySearch = () => {
                 )}
                 </GoogleMap>
             </div>
-            <button type="submit">Search</button>
+            <br/>
+            <Button variant="contained" type="submit" className="btn btn-primary middle">Search Story</Button>
             </form> 
-      {stories.length > 0 && (
-        <>
-          <h3>Search Results:</h3>
-          <ul>
-            {stories.map((story) => (
-              <li key={story.id}>
-                <h4 className='title-search' onClick={() => handleStoryClick(story.id)}>
-                  {story.title}
-                </h4>
-                <p>
-                  author:{' '}
-                  <span
-                    className='author-search'
-                    onClick={() => handleUserClick(story.author)}
-                  >
-                    {story.author_username}
-                  </span>
-                </p>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {totalPages > 1 && (
-        <div className='pagination-search'>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          {renderPageNumbers()}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+            {stories.length > 0 && (
+  <>
+    <h3>Search Results:</h3>
+    <div>
+      {stories.map(story => (
+          <div key={story.id} className="story-box">
+            <div className="story-details">
+              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+              <p className="story-author">by {story.author_username || 'Unknown'}</p>
+            </div>
+          </div>
+        ))}
+    </div>
+  </>
+)}
+{totalPages > 1 && (
+  <div className="pagination-search">
+    <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+      Previous
+    </Button>
+    {renderPageNumbers()}
+    <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+      Next
+    </Button>
+  </div>
+)}
     </div>
   );
 };

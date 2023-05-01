@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from './StoriesByFollowingsUsers.module.css';
 import withAuth from '../../authCheck';
+import { Button } from '@mui/material';
+
 
 function StoriesByFollowingsUsers() {
   const [stories, setStories] = useState([]);
@@ -116,21 +118,21 @@ function StoriesByFollowingsUsers() {
         ))
       )}
       <div className={styles.pagination}>
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+        <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
           Previous
-        </button>
+        </Button>
         {Array.from({ length: totalPages }, (_, index) => (
-          <button
+          <Button variant="contained"
             key={index}
             className={index + 1 === currentPage ? styles.active : null}
             onClick={() => handlePageChange(index + 1)}
           >
             {index + 1}
-          </button>
+          </Button>
         ))}
-        <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+        <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );

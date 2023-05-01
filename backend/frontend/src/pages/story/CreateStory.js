@@ -217,20 +217,21 @@ function CreateStory() {
                 <Select
                   labelId="date-type-label"
                   id="date-type"
+                  className='date-box'
                   style={{width: "200px"}}
                   value={date_type}
                   onChange={(e) => setDateType(e.target.value)}
                   label="Date Type"
                 >
                   <MenuItem value="">Select a date type</MenuItem>
-                  <MenuItem value="decade">Year</MenuItem>
+                  <MenuItem value="year">Year</MenuItem>
                   <MenuItem value="year_interval">Interval Year</MenuItem>
                   <MenuItem value="normal_date">Normal Date</MenuItem>
                   <MenuItem value="interval_date">Interval Date</MenuItem>
                 </Select>
               </FormControl>
             </div>
-            {date_type === 'decade' &&
+            {date_type === 'year' &&
             <div className='date-type'>
               <TextField
                 id="year"

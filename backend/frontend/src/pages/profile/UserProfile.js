@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 import withAuth from '../../authCheck';
+import { Button } from '@mui/material';
+
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -67,7 +69,7 @@ const UserProfile = () => {
   const fetchUserStories = async (user) => {
     
     try {
-      const response = await axios.get(`http://localhost:8000/user/userStories/${user.id}?page=${currentPage}&size=2`, {
+      const response = await axios.get(`http://localhost:8000/user/userStories/${user.id}?page=${currentPage}&size=5`, {
         withCredentials: true,
       });
       console.log(response.data)
@@ -183,7 +185,7 @@ const UserProfile = () => {
         ) : (
           <div>
             <p>Biography: {user.biography}</p>
-            <button type="button" onClick={() => setIsEditingBio(true)}>Edit</button>
+            <Button variant="contained" type="button" onClick={() => setIsEditingBio(true)}>Edit</Button>
           </div>
         )}
       <p>Followers: {user.followers.length}</p>
@@ -196,27 +198,29 @@ const UserProfile = () => {
       ) : (
         <div>
           {stories.map(story => (
-            <div key={story.id}>
-              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
-              <p>Creation Date: {new Date(story.creation_date).toLocaleString()}</p>
-            </div>
-          ))}
-          <div className="pagination">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPage ? 'active' : null}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-              Next
-            </button>
+                <div key={story.id} className="story-box">
+                  <div className="story-details">
+                    <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+                    <p className="story-author">Creation Date: {new Date(story.creation_date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="pagination">
+                <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+                  Previous
+                </Button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <Button variant="contained"
+                    key={index}
+                    className={index + 1 === currentPage ? 'active' : null}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </Button>
+                ))}
+                <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+                  Next
+              </Button>
           </div>
         </div>
       )}
