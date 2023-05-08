@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 import styles from './StorySearch.css'
+import './StorySearch.css'
 import withAuth from '../../authCheck';
 import {TextField, Select, MenuItem, InputLabel, FormControl,Slider, Button,List, ListItem, ListItemText } from '@mui/material';
 
@@ -271,9 +272,6 @@ const StorySearch = () => {
     return null;
   };
 
-  const formatRadiusLabel = (value) => {
-    return `${value} km`;
-  };
 
   return (
     <div>

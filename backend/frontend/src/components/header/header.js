@@ -64,7 +64,7 @@ function Header() {
                 <Link to="/create-story" className="nav-item nav-link">Create Story</Link>
                 <Link to="/user-profile" className="nav-item nav-link">User Profile</Link>
                 <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginLeft: '40vw' }}>
                   <UserSearch />
                   <LogoutButton />
                 </div>

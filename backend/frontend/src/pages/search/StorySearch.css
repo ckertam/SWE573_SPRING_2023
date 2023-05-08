@@ -112,11 +112,11 @@
   gap: 16px;
 }
 
-.date-type .MuiOutlinedInput-root {
+.date-type-search .MuiOutlinedInput-root {
   background-color: white; 
 }
 
-.date-box {
+.date-box-search {
   width: 200px;
   background-color: white; 
 }
