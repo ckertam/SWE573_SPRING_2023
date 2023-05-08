@@ -8,6 +8,11 @@ import Heart from "react-animated-heart";
 import CommentSection from './CommentSection';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Chip from '@mui/material/Chip';
 
 function StoryDetails() {
   const [story, setStory] = useState(null);
@@ -19,9 +24,25 @@ function StoryDetails() {
   const [liked, setLiked] = useState(false);
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState(null);
-
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   // const PHOTOS_PER_PAGE = 3;
   const COMMENTS_PER_PAGE = 5;
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+  
 
   const fetchUserDetails = async () => {
     try {
@@ -52,6 +73,10 @@ function StoryDetails() {
     };
     fetchStory();
   }, [userId]);
+
+  // useEffect(()=>{
+  //   console.log(story,"story")
+  // },[story])
 
   const handleUserClick = async (id) => {
     navigate(`/user-profile/${id}`);
@@ -111,32 +136,113 @@ function StoryDetails() {
     }
   };
 
+  const handleEditButtonClick = () => {
+    setIsEditMode(true);
+    setOpen(true)
+    setEditedContent(story.content);
+    console.log(story,"story")
+  };
+
+  const handleSaveButtonClick = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/user/storyUpdate/${id}`,
+        { content: editedContent },
+        { withCredentials: true }
+      );
+      setIsEditMode(false);
+      setStory({ ...story, content: editedContent });
+    } catch (error) {
+      console.log(error);
+    }
+    setOpen(false)
+  };
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image", "video"]
+    ]
+  };
+
 
   return (
     <div className="story-details-wrapper">
       {story ? (
         <>
-          <h1>{story.title}</h1>
-          
-          <p>
-            author:{' '}
-            <span className='authorStoryDetail' onClick={() => handleUserClick(story.author)}>
-              {story.author_username}
-            </span>
-          </p>
-          <p>{`creation date: ${new Date(story.creation_date).toLocaleDateString()}`}</p>
-          <p>{`${formatDate()}`}</p>
-          <p>{story.season_name && `Season: ${(story.season_name)} `}</p>
+       <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        alignItems: 'center', // Center the elements
+        marginTop: '16px', // Add margin to the top
+      }}
+    >
+      <Typography variant="h4" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+        {story.title}
+      </Typography>
+
+      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+        Author:{' '}
+        <Chip
+          label={story.author_username}
+          onClick={() => handleUserClick(story.author)}
+          color="primary"
+          variant="outlined"
+          sx={{ fontFamily: 'Shadows Into Light, cursive' }}
+        />
+      </Typography>
+      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+        {`Creation date: ${new Date(story.creation_date).toLocaleDateString()}`}
+      </Typography>
+      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+        {`${formatDate()}`}
+      </Typography>
+      {story.season_name && (
+        <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+          {`Season: ${story.season_name}`}
+        </Typography>
+      )}
+    </Box>
+          {userId === story.author && (
+                <Button sx={{ fontFamily: 'Shadows Into Light, cursive' }} onClick={handleEditButtonClick}>Edit</Button>
+          )}
           <div className='quill-container'>
-          
-            <ReactQuill
-              className="story-content"
-              value={story.content}
-              readOnly={true}
-              modules={{ toolbar: false }}
-             />
-            </div>
-          <p>{`tags: ${story.story_tags}`}</p>
+              
+              
+                <ReactQuill
+                className="story-content"
+                value={story.content}
+                readOnly={true}
+                modules={{ toolbar: false }}
+              />
+      
+              
+
+<Modal
+  open={open}
+  onClose={handleClose}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+>
+  <Box sx={style}>
+  <ReactQuill
+                className="story-content"
+                value={editedContent}
+                readOnly={false}
+                onChange={setEditedContent}
+                modules={modules}
+              />
+                              <Button onClick={handleSaveButtonClick}>Save</Button>
+
+  </Box>
+</Modal>
+            
+          </div>
+          <p style={{ fontFamily: 'Shadows Into Light, cursive' }}>{`tags: ${story.story_tags}`}</p>
           <div> 
           <button
             onClick={handleLikeDislike}
@@ -145,7 +251,7 @@ function StoryDetails() {
              <Heart isClick={liked} onClick={() => setLiked(!liked)}/>
           </button>
           <br/>
-          <span>{numLikes} </span>
+          <span style={{ fontFamily: 'Shadows Into Light, cursive' }}>{numLikes} </span>
         </div>
 
           {story.location_ids.length > 0 && (
@@ -164,7 +270,7 @@ function StoryDetails() {
                 </div>
               </>
             )}
-          <CommentSection storyId={id} comments={comments} setComments={setComments} />
+          <CommentSection style={{ fontFamily: 'Shadows Into Light, cursive' }} storyId={id} comments={comments} setComments={setComments} />
         </>
       ) : (
         <p>Loading...</p>

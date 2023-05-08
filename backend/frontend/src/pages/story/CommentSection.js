@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams,useNavigate  } from 'react-router-dom';
 import './CommentSection.css'
+import { Button, TextField, Box } from '@mui/material';
 
 const COMMENTS_PER_PAGE = 5;
 
@@ -100,10 +101,10 @@ function CommentSection({ comments, setComments}) {
 
   return (
     <div>
-      <h2>Comments</h2>
+      <h2 style={{ fontFamily: 'Shadows Into Light, cursive' }}>Comments</h2>
       {comments &&
         comments.map((comment) => (
-          <div key={comment.id} className="comment-container">
+          <div key={comment.id} className="comment-container" style={{ fontFamily: 'Shadows Into Light, cursive' }}>
                 <img
                 className="comment-photo"
                 src={profilePhotos[comment.comment_author_id]}
@@ -143,16 +144,43 @@ function CommentSection({ comments, setComments}) {
           </button>
         )}
       </div>
-      <div>
-        <label htmlFor="comment">Add a comment:</label>
-        <textarea
-          id="comment"
-          name="comment"
-          value={commentText}
-          onChange={(event) => setCommentText(event.target.value)}
-        />
-        <button onClick={handleCommentSubmit}>Submit</button>
-      </div>
+      <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        alignItems: 'flex-start',
+      }}
+    >
+      <TextField
+        sx={{
+          '& .MuiInputBase-input': {
+        fontFamily: 'Shadows Into Light, cursive',
+          },
+          '& .MuiInputLabel-root': {
+            fontFamily: 'Shadows Into Light, cursive',
+          },
+        }}
+        id="comment"
+        name="comment"
+        label="Add a comment"
+        multiline
+        rows={4}
+        value={commentText}
+        onChange={(event) => setCommentText(event.target.value)}
+        variant="outlined"
+        fullWidth
+      />
+      <Button
+        onClick={handleCommentSubmit}
+        variant="contained"
+        color="primary"
+        sx={{ fontFamily: 'Shadows Into Light, cursive' }}
+
+      >
+        Submit
+      </Button>
+    </Box>
     </div>
   );
 }
