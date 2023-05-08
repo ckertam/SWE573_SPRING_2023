@@ -8,6 +8,7 @@ urlpatterns = [
     path('refresh', RefreshUserAuthAPIView.as_view()),
     path('logout', LogoutAPIView.as_view()),
     path('storyCreate',CreateStoryView.as_view()),
+    path('storyUpdate/<int:pk>', UpdateStoryView.as_view()),
     path('like/<int:pk>',LikeStoryView.as_view()),
     path('storyGet/<int:pk>', StoryDetailView.as_view()),
     path('storyGetbyAuthor/<int:user_id>', StoryAuthorView.as_view()),
