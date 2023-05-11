@@ -107,9 +107,7 @@
     text-align: center;
     display: inline-block;
   }
-  .ql-container {
-    font-family: 'Shadows Into Light', cursive !important;
-  }
+
   .story-details-wrapper {
     max-width: 500px;
     margin: 0 auto;

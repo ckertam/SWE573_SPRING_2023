@@ -10,10 +10,8 @@ function UserSearch() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch autocomplete suggestions here
     const fetchSuggestions = async () => {
       if (searchQuery.length > 0) {
-        // Replace the URL with your API endpoint for fetching suggestions
         try {
           const response = await axios.get(
             `http://localhost:8000/user/searchUser?search=${searchQuery}`,

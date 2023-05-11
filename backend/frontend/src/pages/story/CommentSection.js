@@ -101,10 +101,10 @@ function CommentSection({ comments, setComments}) {
 
   return (
     <div>
-      <h2 style={{ fontFamily: 'Shadows Into Light, cursive' }}>Comments</h2>
+      <h2>Comments</h2>
       {comments &&
         comments.map((comment) => (
-          <div key={comment.id} className="comment-container" style={{ fontFamily: 'Shadows Into Light, cursive' }}>
+          <div key={comment.id} className="comment-container">
                 <img
                 className="comment-photo"
                 src={profilePhotos[comment.comment_author_id]}
@@ -124,25 +124,21 @@ function CommentSection({ comments, setComments}) {
           </div>
         ))}
       <div className="pagination">
-        {hasPrevPage && (
-          <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-            Previous
-          </button>
-        )}
+      <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+          Previous
+        </Button>
         {Array.from({ length: totalPages }, (_, index) => (
-          <button
+          <Button variant="contained"
             key={index}
             className={index + 1 === currentPage ? 'active' : null}
             onClick={() => handlePageChange(index + 1)}
           >
             {index + 1}
-          </button>
+          </Button>
         ))}
-        {hasNextPage && (
-          <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-            Next
-          </button>
-        )}
+        <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+          Next
+        </Button>
       </div>
       <Box
       sx={{
@@ -153,14 +149,6 @@ function CommentSection({ comments, setComments}) {
       }}
     >
       <TextField
-        sx={{
-          '& .MuiInputBase-input': {
-        fontFamily: 'Shadows Into Light, cursive',
-          },
-          '& .MuiInputLabel-root': {
-            fontFamily: 'Shadows Into Light, cursive',
-          },
-        }}
         id="comment"
         name="comment"
         label="Add a comment"
@@ -175,7 +163,6 @@ function CommentSection({ comments, setComments}) {
         onClick={handleCommentSubmit}
         variant="contained"
         color="primary"
-        sx={{ fontFamily: 'Shadows Into Light, cursive' }}
 
       >
         Submit

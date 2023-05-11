@@ -181,34 +181,33 @@ function StoryDetails() {
         marginTop: '16px', // Add margin to the top
       }}
     >
-      <Typography variant="h4" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+      <Typography variant="h4">
         {story.title}
       </Typography>
 
-      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+      <Typography variant="body1">
         Author:{' '}
         <Chip
           label={story.author_username}
           onClick={() => handleUserClick(story.author)}
           color="primary"
           variant="outlined"
-          sx={{ fontFamily: 'Shadows Into Light, cursive' }}
         />
       </Typography>
-      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+      <Typography variant="body1">
         {`Creation date: ${new Date(story.creation_date).toLocaleDateString()}`}
       </Typography>
-      <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+      <Typography variant="body1">
         {`${formatDate()}`}
       </Typography>
       {story.season_name && (
-        <Typography variant="body1" sx={{ fontFamily: 'Shadows Into Light, cursive' }}>
+        <Typography variant="body1">
           {`Season: ${story.season_name}`}
         </Typography>
       )}
     </Box>
           {userId === story.author && (
-                <Button sx={{ fontFamily: 'Shadows Into Light, cursive' }} onClick={handleEditButtonClick}>Edit</Button>
+                <Button onClick={handleEditButtonClick}>Edit</Button>
           )}
           <div className='quill-container'>
               
@@ -242,7 +241,7 @@ function StoryDetails() {
 </Modal>
             
           </div>
-          <p style={{ fontFamily: 'Shadows Into Light, cursive' }}>{`tags: ${story.story_tags}`}</p>
+          <p>{`tags: ${story.story_tags}`}</p>
           <div> 
           <button
             onClick={handleLikeDislike}
@@ -251,7 +250,7 @@ function StoryDetails() {
              <Heart isClick={liked} onClick={() => setLiked(!liked)}/>
           </button>
           <br/>
-          <span style={{ fontFamily: 'Shadows Into Light, cursive' }}>{numLikes} </span>
+          <span>{numLikes} </span>
         </div>
 
           {story.location_ids.length > 0 && (
@@ -270,7 +269,7 @@ function StoryDetails() {
                 </div>
               </>
             )}
-          <CommentSection style={{ fontFamily: 'Shadows Into Light, cursive' }} storyId={id} comments={comments} setComments={setComments} />
+          <CommentSection storyId={id} comments={comments} setComments={setComments} />
         </>
       ) : (
         <p>Loading...</p>
