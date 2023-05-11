@@ -2,6 +2,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Group,Permission
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
+from datetime import timedelta
+from django.utils import timezone
+from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name="e-mail", max_length = 100, unique = True)
@@ -25,13 +29,13 @@ class PhotoForStory(models.Model):
 
 
 class Story(models.Model):
-    SEASON = 'season'
+    YEAR_INTERVAL = 'year_interval'
     DECADE = 'decade'
     NORMAL_DATE = 'normal_date'
     INTERVAL_DATE = 'interval_date'
     
     DATE_TYPES = [
-        (SEASON, 'Season'),
+        (YEAR_INTERVAL, 'Year Interval'),
         (DECADE, 'Decade'),
         (NORMAL_DATE, 'Normal Date'),
         (INTERVAL_DATE, 'Interval Date'),
@@ -40,12 +44,14 @@ class Story(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, null=True)
-    content = models.TextField(null=True)
+    content = RichTextField(null=True)
     creation_date = models.DateTimeField(null=True,auto_now_add=True)
     story_tags = models.CharField(max_length=255, null=True)
     location_ids = models.ManyToManyField(Location, blank=True)
     date_type = models.CharField(max_length=20, choices=DATE_TYPES, default=NORMAL_DATE)
     season_name = models.CharField(max_length=255, null=True, blank=True)
+    start_year = models.PositiveIntegerField(null=True, blank=True)
+    end_year = models.PositiveIntegerField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
@@ -56,7 +62,7 @@ class Story(models.Model):
     def clean(self):
         # Custom validation to ensure only one date field is set
 
-        date_fields = [self.season_name, self.year, self.date, self.end_date]
+        date_fields = [self.start_year, self.year, self.date, self.end_date]
         print(date_fields)
         if date_fields.count(None) != 3:
             raise ValidationError("Only one type of date field should be set.")
@@ -77,3 +83,21 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.comment_author} on {self.story.title}'
+    
+class PasswordResetToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.token = get_random_string(length=64)
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+
+class Content(models.Model):
+    title = models.CharField(max_length=200)
+    content = RichTextField()
+
+    def __str__(self):
+        return self.title

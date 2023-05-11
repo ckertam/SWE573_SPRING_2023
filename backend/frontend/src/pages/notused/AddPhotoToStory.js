@@ -70,7 +70,7 @@ function AddPhotoToStory() {
   
 
   const handleRemovePhoto = async (index) => {
-    // You may need to modify this line based on your API.
+
     const photo_id = uploadedPhotos[index].id;
   
     try {

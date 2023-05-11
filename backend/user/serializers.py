@@ -1,9 +1,11 @@
 # serializers.py
 from rest_framework import serializers
-from user.models import User,Story,Location,Comment,PhotoForStory #, Date, SpecificDate, Decade, Season
+from user.models import User,Story,Location,Comment,PhotoForStory,Content #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
 from .functions import *
 import urllib.parse
+from django.contrib.auth.hashers import make_password
+
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -16,17 +18,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-
-
         if validated_data["password"] != validated_data["password_again"]:
-            print("caner")
-            raise serializers.ValidationError("Passwords do no match!")
-            
-        user_data = self.Meta.model(**validated_data)
-
+            raise serializers.ValidationError("Passwords do not match!")
         
+        validated_data["password"] = make_password(validated_data["password"])
+        del validated_data["password_again"]
 
-        #user_data.set_password(password)
+        user_data = self.Meta.model(**validated_data)
         user_data.save()
         return user_data
 
@@ -94,24 +92,26 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ['id', 'author','author_username', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year', 'date','creation_date','start_date','end_date','likes']
+        fields = ['id', 'author','author_username', 'title', 'content', 'story_tags', 'location_ids', 'date_type', 'season_name', 'year','start_year','end_year', 'date','creation_date','start_date','end_date','likes']
 
     def validate(self, attrs):
         date_type = attrs.get('date_type')
+        start_year = attrs.get('start_year')
+        end_year = attrs.get('end_year')
         season_name = attrs.get('season_name')
         year = attrs.get('year')
         date = attrs.get('date')
         start_date = attrs.get('start_date')
         end_date = attrs.get('end_date')
 
-        if date_type == Story.SEASON and (year is not None or date is not None):
-            raise serializers.ValidationError("Only 'season_name' field should be set when 'date_type' is 'season'.")
-        elif date_type == Story.DECADE and (season_name is not None or date is not None or start_date is not None or end_date is not None):
+        if date_type == Story.YEAR_INTERVAL and (year is not None or date is not None or start_date is not None or end_date is not None):
+            raise serializers.ValidationError("Only 'year_interval' field should be set when 'date_type' is 'year_interval'.")
+        elif date_type == Story.DECADE and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'decade'.")
-        elif date_type == Story.NORMAL_DATE and (season_name is not None or year is not None or start_date is not None or end_date is not None):
+        elif date_type == Story.NORMAL_DATE and (start_year is not None or end_year is not None or year is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
-        elif date_type == Story.INTERVAL_DATE and (season_name is not None or year is not None or date is not None):
-            raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
+        elif date_type == Story.INTERVAL_DATE and (start_year is not None or end_year is not None or year is not None or date is not None):
+            raise serializers.ValidationError("Only 'date_interval' field should be set when 'date_type' is 'date_interval'.")
 
         return attrs
 
@@ -121,7 +121,6 @@ class StorySerializer(serializers.ModelSerializer):
 
         location_data = validated_data.pop('location_ids')
         for location in location_data:
-            # Encode the location name using URL encoding
             location['name'] = urllib.parse.quote(location['name'], safe='')
             locations = [Location.objects.create(**location) for location in location_data]
 
@@ -149,11 +148,18 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentGetSerializer(serializers.ModelSerializer):
     comment_author = serializers.SerializerMethodField()
+    comment_author_id = serializers.SerializerMethodField()
 
     def get_comment_author(self, obj):
         return obj.comment_author.username
+    def get_comment_author_id(self, obj):
+        return obj.comment_author.id
 
     class Meta:
         model = Comment
-        fields = ['id', 'comment_author', 'story', 'text', 'date']
+        fields = ['id', 'comment_author','comment_author_id', 'story', 'text', 'date']
 
+class ContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content
+        fields = '__all__'

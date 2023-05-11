@@ -1,24 +1,28 @@
 # views.py
-from rest_framework import status, views, generics
+from rest_framework import status, views
 from rest_framework.response import Response
-from .serializers import *
-from .models import User,Story,Comment
-from .authentication import *
-from .functions import auth_check
-from django.shortcuts import get_object_or_404
-import json
 from rest_framework.permissions import AllowAny
-from django.http import HttpResponse, HttpResponseNotFound
-import os,base64
+from rest_framework.exceptions import PermissionDenied 
+from django.http import HttpResponse
+from django.contrib.auth.tokens import default_token_generator
 from django.core.paginator import Paginator
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
-from math import ceil,cos, radians
-from rest_framework.exceptions import PermissionDenied 
+from django.core.mail import send_mail
 from django.db.models import Q
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, smart_str
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+import json
+import os,base64
+from math import ceil,cos, radians
 from datetime import datetime, timedelta
-
-
+from .serializers import *
+from .models import User,Story,Comment
+from .authentication import *
+from .models import PasswordResetToken
+from django.contrib.auth import authenticate
 
 
 class UserRegistrationView(views.APIView):
@@ -50,25 +54,19 @@ class UserLoginView(views.APIView):
         password = body.get('password')
 
         # Use the username and password to authenticate the user
-        user = User.objects.filter(username=username).first()
+        user = authenticate(request, username=username, password=password)
 
-        
-        if user is None :
-            return Response({'error': 'Invalid username'}, status=400)
-        if user.check_password(password):
-            return Response({'error': 'Wrong password'}, status=400)
-        
+        if user is None:
+            return Response({'error': 'Invalid username or password'}, status=400)
 
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
-        print(access_token)
-        print(refresh_token)
         response = Response()
 
-        response.set_cookie(key='refreshToken', value = refresh_token, httponly= True)
+        response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
         response.data = {
             'access': access_token,
-            'refresh' : refresh_token
+            'refresh': refresh_token
         }
 
         return response
@@ -126,7 +124,25 @@ class CreateStoryView(views.APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UpdateStoryView(views.APIView):
+    def put(self, request, pk):
 
+        # Check if the user is authenticated
+        # user_id = auth_check(request) # when using postman
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        # Get the story and check if the user is the author
+        story = get_object_or_404(Story, pk=pk)
+        # if story.author.id != user_id:
+        #     return Response({"detail": "You do not have permission to edit this story."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Update the story content
+        content = request.data.get("content")
+        if content is not None:
+            story.content = content
+            story.save()
+            return Response("ok")
 
 class AddStoryPhotoView(views.APIView):
 
@@ -314,6 +330,7 @@ class StoryAuthorView(views.APIView):
         user_id_new = decode_refresh_token(cookie_value)
 
         if user_id:
+            #print("caneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer")
             user = get_object_or_404(User, pk=user_id)
             stories = Story.objects.filter(author=user_id).order_by('-creation_date')
         else:
@@ -322,6 +339,41 @@ class StoryAuthorView(views.APIView):
             user = get_object_or_404(User, pk=user_id)
             user_ids = user.following.values_list('id', flat=True)
             stories = Story.objects.filter(author__in=user_ids).order_by('-creation_date')
+
+        print(stories)
+        #print(followed_users)
+        #followed_users_ids = followed_users.values_list('id', flat=True)
+
+        # Get the page number and size
+        page_number = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('size', 3))
+
+        # Paginate the stories
+        
+        paginator = Paginator(stories, page_size)
+        total_pages = ceil(paginator.count / page_size)
+        page = paginator.get_page(page_number)
+
+        serializer = StorySerializer(page, many=True)
+
+        
+        return Response({
+            'stories': serializer.data,
+            'has_next': page.has_next(),
+            'has_prev': page.has_previous(),
+            'next_page': page.next_page_number() if page.has_next() else None,
+            'prev_page': page.previous_page_number() if page.has_previous() else None,
+            'total_pages': total_pages,
+        }, status=status.HTTP_200_OK)
+    
+class AllStoryView(views.APIView):
+    def get(self, request):
+
+
+        cookie_value = request.COOKIES['refreshToken']
+        user_id = decode_refresh_token(cookie_value)
+
+        stories = Story.objects.exclude(Q(author__id=user_id)).order_by('-creation_date')
 
         print(stories)
         #print(followed_users)
@@ -449,6 +501,9 @@ class UserPhotoView(views.APIView):
             user_id = decode_refresh_token(cookie_value)
             user = get_object_or_404(User, pk=user_id)
 
+        if not user.profile_photo:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         serializer = UserPhotoSerializer(user)
         file_ext = os.path.splitext(user.profile_photo.name)[-1].lower()
         print(user.profile_photo)
@@ -514,7 +569,7 @@ class SearchUserView(views.APIView):
         }, status=status.HTTP_200_OK)
     
 class SearchStoryView(views.APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs ):
         cookie_value = request.COOKIES['refreshToken']
         user_id = decode_refresh_token(cookie_value)
         user = get_object_or_404(User, pk=user_id)
@@ -524,30 +579,39 @@ class SearchStoryView(views.APIView):
         time_type = request.query_params.get('time_type', '')
         time_value = request.query_params.get('time_value', '')
         location = request.query_params.get('location', '')
+        radius_diff = float(request.query_params.get('radius_diff', ''))
+        date_diff = float(request.query_params.get('date_diff', ''))
 
         query_filter = Q()
         if title_search:
             query_filter &= Q(title__icontains=title_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
-        print(time_type)
-        print(time_value)
+        # print(time_type)
+        # print(time_value)
         if time_type and time_value:
 
             time_value = json.loads(time_value)
-
+            # print(time_value)
             if time_type == 'season':
                 time_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=time_value)
-            elif time_type == 'decade':
+            elif time_type == 'year':
                 time_value = time_value["year"]
-                query_filter &= Q(year__gte=time_value) ##here can be change for now it shows greater than of that year
+                season_value = time_value["seasonName"]
+                query_filter &= Q(season_name__icontains=season_value, year__e=time_value)
+            elif time_type == 'year_interval':
+                start_year = time_value["startYear"]
+                end_year = time_value["endYear"]
+                season_value = time_value["seasonName"]
+                query_filter &= Q(season_name__icontains=season_value, start_year__gte=start_year, end_year__lte=end_year) ##here can be change for now it shows greater than of that year
             elif time_type == 'normal_date':
-                given_date = datetime.strptime(time_value["date"], "%Y-%m-%d").date()
+
+                given_date = datetime.strptime(time_value["date"], "%Y-%m-%d")
 
                 # Calculate the date range
-                start_date = given_date - timedelta(days=2)
-                end_date = given_date + timedelta(days=2)
+                start_date = given_date - timedelta(days=date_diff)
+                end_date = given_date + timedelta(days=date_diff)
                 query_filter &= Q(date__range=(start_date, end_date)) ##I can change the date to get 2 dates for interval on normal_date too
                 #time_value = time_value["date"]
                 ##query_filter &= Q(date=time_value)
@@ -560,7 +624,7 @@ class SearchStoryView(views.APIView):
             location = json.loads(location)
             lat = location['latitude']
             lng = location['longitude']
-            radius = 25  # radius set for near search
+            radius = radius_diff  # radius set for near search
 
             query_filter &= Q(
                 location_ids__latitude__range=(lat - radius / 110.574, lat + radius / 110.574),
@@ -587,3 +651,54 @@ class SearchStoryView(views.APIView):
             'prev_page': page.previous_page_number() if page.has_previous() else None,
             'total_pages': total_pages,
         }, status=status.HTTP_200_OK)
+    
+
+class SendPasswordResetEmail(views.APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        user = User.objects.filter(email=email).first()
+        if user:
+            token, created = PasswordResetToken.objects.get_or_create(user=user)
+            token.created_at = timezone.now()
+            token.save()
+
+            user_id = str(user.pk)
+            encoded_user_id = urlsafe_base64_encode(force_bytes(user_id))
+            # Send password reset email
+            subject = "Password Reset Request"
+            token_str = default_token_generator.make_token(user)
+            email_body = (
+                f"To reset your password, click the link below:\n\n"
+                f"http://localhost:3000/resetPassword/{token_str}/{encoded_user_id}\n"
+            )
+            send_mail(subject, email_body, "noreply@yourapp.com", [email])
+
+        return Response({"detail": "Password reset email sent."}, status=status.HTTP_200_OK)
+
+class ResetPassword(views.APIView):
+    def post(self, request, token, uidb64):
+        print("caner")
+        print(uidb64)
+        print(token)
+
+        user_id = smart_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=int(user_id))
+
+        if default_token_generator.check_token(user, token):
+            new_password = request.data.get("new_password")
+            user.set_password(new_password)
+            user.save()
+            return Response({"detail": "Password has been reset."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class StoryDeleteAPIView(views.APIView):
+    def delete(self, request):
+        queryset = Story.objects.filter(
+            Q(season_name__isnull=False) & (
+                Q(year__isnull=True) & Q(end_date__isnull=True) &
+                Q(start_date__isnull=True) & Q(end_year__isnull=True) & Q(start_year__isnull=True)
+            )
+        )
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

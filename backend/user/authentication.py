@@ -1,11 +1,12 @@
-import jwt, datetime
+import jwt
+from datetime import datetime, timedelta
 from rest_framework import exceptions
 
 def create_access_token(id):
     token = jwt.encode({
         'user_id':id,
-        'exp':datetime.datetime.utcnow() + datetime.timedelta(seconds=300),
-        'iat': datetime.datetime.utcnow()
+        'exp':datetime.utcnow() + timedelta(seconds=300),
+        'iat': datetime.utcnow()
     }, 'access_secret', algorithm='HS256')
     token_new = token.decode('utf-8')
     return  token_new
@@ -24,8 +25,8 @@ def decode_access_token(token):
 def create_refresh_token(id):
     token  = jwt.encode({
         'user_id':id,
-        'exp':datetime.datetime.utcnow() + datetime.timedelta(days=7),
-        'iat': datetime.datetime.utcnow()
+        'exp':datetime.utcnow() + timedelta(days=7),
+        'iat': datetime.utcnow()
     }, 'refresh_secret', algorithm='HS256')   
     token_new = token.decode('utf-8')
     return  token_new

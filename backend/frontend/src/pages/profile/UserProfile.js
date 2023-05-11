@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
-import withAuth from './authCheck';
+import withAuth from '../../authCheck';
+import { TextField, Button, Paper } from '@mui/material';
+
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -20,9 +22,12 @@ const UserProfile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchUserDetails();
-    fetchProfilePhoto();
-    fetchUserStories();
+    const fetchData = async () => {
+      const fetchedUser = await fetchUserDetails(); 
+      fetchProfilePhoto();
+      fetchUserStories(fetchedUser); 
+    };
+    fetchData();
   }, [currentPage]);
 
   const fetchUserDetails = async () => {
@@ -34,6 +39,7 @@ const UserProfile = () => {
       });
       setUser(response.data);
       setUpdatedBio(response.data.biography);
+      return response.data;
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
@@ -60,11 +66,13 @@ const UserProfile = () => {
     
   };
 
-  const fetchUserStories = async () => {
+  const fetchUserStories = async (user) => {
+    
     try {
-      const response = await axios.get(`http://localhost:8000/user/userStories?page=${currentPage}&size=5`, {
+      const response = await axios.get(`http://localhost:8000/user/userStories/${user.id}?page=${currentPage}&size=5`, {
         withCredentials: true,
       });
+      console.log(response.data)
       setStories(response.data.stories);
       setHasNextPage(response.data.has_next);
       setHasPrevPage(response.data.has_prev);
@@ -159,6 +167,7 @@ const UserProfile = () => {
           onChange={handleProfilePhotoChange}
         />
       </div>
+      <br/>
       <div>
         <button 
         type="button"
@@ -170,17 +179,41 @@ const UserProfile = () => {
       
       {isEditingBio ? (
           <div>
-            <input value={updatedBio} onChange={(e) => setUpdatedBio(e.target.value)} />
-            <button type="button" onClick={handleProfileBioChange}>Save</button>
-            <button type="button" onClick={() => setIsEditingBio(false)}>Cancel</button>
-          </div>
+          <div className='edit-box'>
+            <TextField 
+            value={updatedBio} 
+            onChange={(e) => setUpdatedBio(e.target.value)} 
+            multiline={true}
+            rowsMax={100}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
+                setUpdatedBio((prev) => prev + '\n');
+              }
+            }}
+            InputProps={{ className: 'edit-box' }}
+            />
+            </div>  
+            <div className='edit-buttons'>
+            <Button variant="contained" color='success' type="button" onClick={handleProfileBioChange}>Save</Button>
+            <Button variant="contained" type="button" onClick={() => setIsEditingBio(false)}>Cancel</Button>
+            </div> 
+          </div> 
         ) : (
           <div>
-            <p>Biography: {user.biography}</p>
-            <button type="button" onClick={() => setIsEditingBio(true)}>Edit</button>
+            <br/>
+            <Paper elevation={3} className="custom-bio">
+            <strong>Biography</strong>
+            <p>{user.biography.split('\n').map((line, index) => <span key={index}>{line}<br/></span>)}</p>
+            </Paper>
+            <Button variant="contained" type="button" onClick={() => setIsEditingBio(true)}>Edit</Button>
           </div>
         )}
-      <p>Followers: {user.followers.length}</p>
+        <br/>
+      <Paper elevation={3} className="custom-followers">
+            <strong>Followers</strong>
+            <p>{user.followers.length !== null ? user.followers.length : 'Loading...'}</p>
+          </Paper>
 
       <h2>Stories</h2>
       {loading ? (
@@ -190,27 +223,29 @@ const UserProfile = () => {
       ) : (
         <div>
           {stories.map(story => (
-            <div key={story.id}>
-              <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
-              <p>Creation Date: {new Date(story.creation_date).toLocaleString()}</p>
-            </div>
-          ))}
-          <div className="pagination">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPage ? 'active' : null}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
-              Next
-            </button>
+                <div key={story.id} className="story-box">
+                  <div className="story-details">
+                    <h3 className="story-title" onClick={() => handleStoryClick(story.id)}>{story.title}</h3>
+                    <p className="story-author">Creation Date: {new Date(story.creation_date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="pagination">
+                <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={!hasPrevPage}>
+                  Previous
+                </Button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <Button variant="contained"
+                    key={index}
+                    className={index + 1 === currentPage ? 'active' : null}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </Button>
+                ))}
+                <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={!hasNextPage}>
+                  Next
+              </Button>
           </div>
         </div>
       )}
