@@ -30,13 +30,13 @@ class PhotoForStory(models.Model):
 
 class Story(models.Model):
     YEAR_INTERVAL = 'year_interval'
-    DECADE = 'decade'
+    YEAR = 'year'
     NORMAL_DATE = 'normal_date'
     INTERVAL_DATE = 'interval_date'
     
     DATE_TYPES = [
         (YEAR_INTERVAL, 'Year Interval'),
-        (DECADE, 'Decade'),
+        (YEAR, 'year'),
         (NORMAL_DATE, 'Normal Date'),
         (INTERVAL_DATE, 'Interval Date'),
     ]

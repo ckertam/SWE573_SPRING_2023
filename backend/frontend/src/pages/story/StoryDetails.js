@@ -87,7 +87,7 @@ function StoryDetails() {
   const formatDate = () => {
     // format the date based on the date_type of the story
     switch (story.date_type) {
-      case 'decade':
+      case 'year':
         return `Year: ${story.year}`;
       case 'year_interval':
         const startYear = story.start_year;

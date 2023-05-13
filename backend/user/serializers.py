@@ -106,8 +106,8 @@ class StorySerializer(serializers.ModelSerializer):
 
         if date_type == Story.YEAR_INTERVAL and (year is not None or date is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'year_interval' field should be set when 'date_type' is 'year_interval'.")
-        elif date_type == Story.DECADE and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
-            raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'decade'.")
+        elif date_type == Story.YEAR and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
+            raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'year'.")
         elif date_type == Story.NORMAL_DATE and (start_year is not None or end_year is not None or year is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
         elif date_type == Story.INTERVAL_DATE and (start_year is not None or end_year is not None or year is not None or date is not None):
