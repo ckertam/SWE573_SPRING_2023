@@ -14,6 +14,7 @@ function CommentSection({ comments, setComments}) {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [profilePhotos, setProfilePhotos] = useState({});
+  const [defaultProfilePhoto] = useState('https://i.stack.imgur.com/l60Hf.png'); 
 
   const navigate = useNavigate();
 
@@ -88,7 +89,7 @@ function CommentSection({ comments, setComments}) {
       return `${dataUrlPrefix}${base64Image}`;
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        // Profile photo not found, do nothing
+        return defaultProfilePhoto;
       } else {
         console.error('Error fetching profile photo:', error);
       }

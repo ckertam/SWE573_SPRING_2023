@@ -173,76 +173,90 @@ function StoryDetails() {
       {story ? (
         <>
        <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        alignItems: 'center', // Center the elements
-        marginTop: '16px', // Add margin to the top
-      }}
-    >
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            alignItems: 'center', // Center the elements
+            marginTop: '16px', // Add margin to the top
+          }}
+        >
       <Typography variant="h4">
         {story.title}
       </Typography>
 
-      <Typography variant="body1">
-        Author:{' '}
+      <div className="info-box">
+        <Typography variant="subtitle1">Author</Typography>
         <Chip
           label={story.author_username}
           onClick={() => handleUserClick(story.author)}
           color="primary"
           variant="outlined"
         />
-      </Typography>
-      <Typography variant="body1">
-        {`Creation date: ${new Date(story.creation_date).toLocaleDateString()}`}
-      </Typography>
-      <Typography variant="body1">
-        {`${formatDate()}`}
-      </Typography>
-      {story.season_name && (
-        <Typography variant="body1">
-          {`Season: ${story.season_name}`}
-        </Typography>
-      )}
-    </Box>
+      </div>
+      
+      <div className="info-box">
+          <Typography variant="subtitle1">Creation Date</Typography>
+          <Typography variant="body1">
+            {new Date(story.creation_date).toLocaleDateString()}
+          </Typography>
+        </div>
+        <div className="info-box">
+          <Typography variant="subtitle1">Story Time</Typography>
+          <Typography variant="body1">
+            {`${formatDate()}`}
+          </Typography>
+        </div>
+        {story.season_name && (
+          <div className="info-box">
+            <Typography variant="subtitle1">Season:</Typography>
+            <Typography variant="body1">
+              {story.season_name}
+            </Typography>
+          </div>
+        )}
+      <div className="info-box">
+        <Typography variant="subtitle1">Tags</Typography>
+        <div className="tags-container">
+          {story.story_tags.split(',').map((tag, index) => (
+            <div key={index} className="tag-box">
+              <Typography variant="body1">{tag.trim()}</Typography>
+            </div>
+          ))}
+        </div>
+      </div>
+      </Box>
           {userId === story.author && (
                 <Button onClick={handleEditButtonClick}>Edit</Button>
           )}
-          <div className='quill-container'>
-              
-              
+          <div className='quill-container'>      
                 <ReactQuill
                 className="story-content"
                 value={story.content}
                 readOnly={true}
                 modules={{ toolbar: false }}
               />
-      
-              
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={style}>
+              <ReactQuill
+                            className="story-content"
+                            value={editedContent}
+                            readOnly={false}
+                            onChange={setEditedContent}
+                            modules={modules}
+                          />
+                                          <Button onClick={handleSaveButtonClick}>Save</Button>
 
-<Modal
-  open={open}
-  onClose={handleClose}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-  <ReactQuill
-                className="story-content"
-                value={editedContent}
-                readOnly={false}
-                onChange={setEditedContent}
-                modules={modules}
-              />
-                              <Button onClick={handleSaveButtonClick}>Save</Button>
-
-  </Box>
-</Modal>
-            
-          </div>
+              </Box>
+            </Modal>
+          {/* </div>
           <p>{`tags: ${story.story_tags}`}</p>
-          <div> 
+          <div>  */}
           <button
             onClick={handleLikeDislike}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
