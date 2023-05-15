@@ -127,17 +127,11 @@ class CreateStoryView(views.APIView):
 class UpdateStoryView(views.APIView):
     def put(self, request, pk):
 
-        # Check if the user is authenticated
-        # user_id = auth_check(request) # when using postman
         cookie_value = request.COOKIES['refreshToken']
         user_id = decode_refresh_token(cookie_value)
 
-        # Get the story and check if the user is the author
         story = get_object_or_404(Story, pk=pk)
-        # if story.author.id != user_id:
-        #     return Response({"detail": "You do not have permission to edit this story."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Update the story content
         content = request.data.get("content")
         if content is not None:
             story.content = content

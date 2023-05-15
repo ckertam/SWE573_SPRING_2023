@@ -2,17 +2,17 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('register', UserRegistrationView.as_view()),
-    path('login', UserLoginView.as_view()),
+    path('register', UserRegistrationView.as_view(), name="register"),
+    path('login', UserLoginView.as_view(),name="login"),
     path('user', AuthUserAPIView.as_view()),
     path('refresh', RefreshUserAuthAPIView.as_view()),
-    path('logout', LogoutAPIView.as_view()),
+    path('logout', LogoutAPIView.as_view(),name="logout"),
     path('storyCreate',CreateStoryView.as_view()),
-    path('storyUpdate/<int:pk>', UpdateStoryView.as_view()),
+    path('storyUpdate/<int:pk>', UpdateStoryView.as_view(),name="storyUpdate"),
     path('like/<int:pk>',LikeStoryView.as_view()),
     path('storyGet/<int:pk>', StoryDetailView.as_view()),
     path('storyGetbyAuthor/<int:user_id>', StoryAuthorView.as_view()), 
-    path('comment/<int:id>',CreateCommentView.as_view()),
+    path('comment/<int:id>',CreateCommentView.as_view(),name="comment"),
     path('commentsByStory/<int:id>',StoryCommentsView.as_view()),
     path('followByUser/<int:id>',FollowUserView.as_view()),
     path('userFollowers',UserFollowersView.as_view()),
