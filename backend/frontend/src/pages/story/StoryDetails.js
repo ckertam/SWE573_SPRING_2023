@@ -37,7 +37,7 @@ function StoryDetails() {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/userDetails', { withCredentials: true });
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userDetails`, { withCredentials: true });
       setUserId(response.data.id);
       setUsername(response.data.username);
     } catch (error) {
@@ -50,7 +50,7 @@ function StoryDetails() {
     const fetchStory = async () => {
       try {
         await fetchUserDetails(); // Get the current user ID
-        const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`, { withCredentials: true });
+        const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storyGet/${id}`, { withCredentials: true });
         setStory(response.data);
         setNumLikes(response.data.likes.length);
         if (userId && response.data.likes.includes(userId)) {
@@ -114,7 +114,7 @@ function StoryDetails() {
 
   const handleLikeDislike = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/user/like/${id}`, {}, { withCredentials: true });
+      const response = await axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/like/${id}`, {}, { withCredentials: true });
       if (response.data.message === 'Like added successfully.') {
         setNumLikes(numLikes + 1);
         setLiked(true);
@@ -137,7 +137,7 @@ function StoryDetails() {
   const handleSaveButtonClick = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8000/user/storyUpdate/${id}`,
+        `http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storyUpdate/${id}`,
         { content: editedContent },
         { withCredentials: true }
       );

@@ -22,7 +22,7 @@ function CommentSection({ comments, setComments}) {
   const fetchComments = async (page) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/user/commentsByStory/${id}?page=${page}&size=${COMMENTS_PER_PAGE}`
+        `http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/commentsByStory/${id}?page=${page}&size=${COMMENTS_PER_PAGE}`
       );
       setComments(response.data.comments);
       setHasNextPage(response.data.has_next);
@@ -56,7 +56,7 @@ function CommentSection({ comments, setComments}) {
   const handleCommentSubmit = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/user/comment/${id}`,
+        `http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/comment/${id}`,
         { text: commentText },
         { withCredentials: true }
       );
@@ -76,7 +76,7 @@ function CommentSection({ comments, setComments}) {
 
   const fetchProfilePhoto = async (userId) => {
     try {
-      const profilePhotoResponse = await axios.get(`http://localhost:8000/user/profilePhoto/${userId}`, {
+      const profilePhotoResponse = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/profilePhoto/${userId}`, {
         headers: {},
         withCredentials: true,
         responseType: 'arraybuffer',

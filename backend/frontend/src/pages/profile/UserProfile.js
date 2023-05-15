@@ -32,7 +32,7 @@ const UserProfile = () => {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/userDetails', {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userDetails`, {
         headers: {
         },
         withCredentials: true,
@@ -47,7 +47,7 @@ const UserProfile = () => {
 
   const fetchProfilePhoto = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/profilePhoto', {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/profilePhoto`, {
         headers: {
         },
         withCredentials: true,
@@ -69,7 +69,7 @@ const UserProfile = () => {
   const fetchUserStories = async (user) => {
     
     try {
-      const response = await axios.get(`http://localhost:8000/user/userStories/${user.id}?page=${currentPage}&size=5`, {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userStories/${user.id}?page=${currentPage}&size=5`, {
         withCredentials: true,
       });
       console.log(response.data)
@@ -102,7 +102,7 @@ const UserProfile = () => {
     formData.append('profile_photo', file);
   
     try {
-      await axios.put('http://localhost:8000/user/profilePhoto', formData, {
+      await axios.put(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/profilePhoto`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -116,7 +116,7 @@ const UserProfile = () => {
 
   const handleRemoveProfilePhoto = async () => {
     try {
-      await axios.delete('http://localhost:8000/user/profilePhoto', {
+      await axios.delete(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/profilePhoto`, {
         withCredentials: true,
       });
       setProfilePhotoUrl(null);
@@ -127,7 +127,7 @@ const UserProfile = () => {
 
   const handleProfileBioChange = async () => {
     try {
-      await axios.put('http://localhost:8000/user/biography', { biography: updatedBio }, {
+      await axios.put(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/biography`, { biography: updatedBio }, {
         withCredentials: true,
       });
       setUser({ ...user, biography: updatedBio });

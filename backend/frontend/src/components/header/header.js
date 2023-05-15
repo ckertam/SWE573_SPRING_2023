@@ -26,7 +26,7 @@ function Header() {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/user', { withCredentials: true });
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/user`, { withCredentials: true });
       if (response && response.data) {
         setIsLoggedIn(true);
       } else {

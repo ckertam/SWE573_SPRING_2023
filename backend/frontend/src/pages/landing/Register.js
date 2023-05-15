@@ -21,7 +21,7 @@ function Register() {
       toast.error("Passwords don't match");
       return;
     }
-    axios.post('http://localhost:8000/user/register', {
+    axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/register`, {
       username: username,
       email: email,
       password: password,
