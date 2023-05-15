@@ -26,7 +26,7 @@ const UserProfileOthers = () => {
 
   const getCurrentUser = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/user', {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/user`, {
         headers: {},
         withCredentials: true,
       });
@@ -50,7 +50,7 @@ const UserProfileOthers = () => {
         }
 
 
-        const userDetailsResponse = await axios.get(`http://localhost:8000/user/userDetails/${id}`, {
+        const userDetailsResponse = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userDetails/${id}`, {
           headers: {},
           withCredentials: true,
         });
@@ -58,7 +58,7 @@ const UserProfileOthers = () => {
         console.log('User details response:', userDetailsResponse.data);
 
         try {
-          const profilePhotoResponse = await axios.get(`http://localhost:8000/user/profilePhoto/${id}`, {
+          const profilePhotoResponse = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/profilePhoto/${id}`, {
             headers: {},
             withCredentials: true,
             responseType: 'arraybuffer',
@@ -77,7 +77,7 @@ const UserProfileOthers = () => {
           }
         }
         
-        const followersResponse = await axios.get(`http://localhost:8000/user/userFollowers/${id}`, {
+        const followersResponse = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userFollowers/${id}`, {
         headers: {},
         withCredentials: true,
         });
@@ -111,7 +111,7 @@ const UserProfileOthers = () => {
 
   const handleFollowClick = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/user/followByUser/${id}`, null, {
+      const response = await axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/followByUser/${id}`, null, {
         headers: {},
         withCredentials: true,
       });
@@ -129,7 +129,7 @@ const UserProfileOthers = () => {
 
   const fetchUserStories = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/user/userStories/${id}?page=${currentPage}&size=5`, {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userStories/${id}?page=${currentPage}&size=5`, {
         withCredentials: true,
       });
       setStories(response.data.stories);

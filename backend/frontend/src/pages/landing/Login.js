@@ -15,7 +15,7 @@ function Login({ onLoginSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/user/login', {
+    axios.post(`http://${process.env.BACKEND_HOST_NAME}:8000/user/login`, {
       username: username,
       password: password
     },{ withCredentials: true }).then(response => {

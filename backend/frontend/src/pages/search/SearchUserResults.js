@@ -24,7 +24,7 @@ function SearchUserResults({  }) {
       try {
         setLoading(true);
         const searchResponse = await axios.get(
-          `http://localhost:8000/user/searchUser?search=${searchQuery}`,
+          `http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/searchUser?search=${searchQuery}`,
           { withCredentials: true }
         );
         console.log('searchResponse:', searchResponse);

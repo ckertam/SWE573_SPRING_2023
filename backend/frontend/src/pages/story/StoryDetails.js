@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Chip from '@mui/material/Chip';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 function StoryDetails() {
   const [story, setStory] = useState(null);
@@ -31,22 +32,12 @@ function StoryDetails() {
   const handleClose = () => setOpen(false);
   // const PHOTOS_PER_PAGE = 3;
   const COMMENTS_PER_PAGE = 5;
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
+
   
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/userDetails', { withCredentials: true });
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/userDetails`, { withCredentials: true });
       setUserId(response.data.id);
       setUsername(response.data.username);
     } catch (error) {
@@ -59,7 +50,7 @@ function StoryDetails() {
     const fetchStory = async () => {
       try {
         await fetchUserDetails(); // Get the current user ID
-        const response = await axios.get(`http://localhost:8000/user/storyGet/${id}`, { withCredentials: true });
+        const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storyGet/${id}`, { withCredentials: true });
         setStory(response.data);
         setNumLikes(response.data.likes.length);
         if (userId && response.data.likes.includes(userId)) {
@@ -87,7 +78,7 @@ function StoryDetails() {
   const formatDate = () => {
     // format the date based on the date_type of the story
     switch (story.date_type) {
-      case 'decade':
+      case 'year':
         return `Year: ${story.year}`;
       case 'year_interval':
         const startYear = story.start_year;
@@ -123,7 +114,7 @@ function StoryDetails() {
 
   const handleLikeDislike = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/user/like/${id}`, {}, { withCredentials: true });
+      const response = await axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/like/${id}`, {}, { withCredentials: true });
       if (response.data.message === 'Like added successfully.') {
         setNumLikes(numLikes + 1);
         setLiked(true);
@@ -146,7 +137,7 @@ function StoryDetails() {
   const handleSaveButtonClick = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8000/user/storyUpdate/${id}`,
+        `http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storyUpdate/${id}`,
         { content: editedContent },
         { withCredentials: true }
       );
@@ -171,113 +162,137 @@ function StoryDetails() {
   return (
     <div className="story-details-wrapper">
       {story ? (
-        <>
-       <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        alignItems: 'center', // Center the elements
-        marginTop: '16px', // Add margin to the top
-      }}
-    >
-      <Typography variant="h4">
-        {story.title}
-      </Typography>
-
-      <Typography variant="body1">
-        Author:{' '}
-        <Chip
-          label={story.author_username}
-          onClick={() => handleUserClick(story.author)}
-          color="primary"
-          variant="outlined"
-        />
-      </Typography>
-      <Typography variant="body1">
-        {`Creation date: ${new Date(story.creation_date).toLocaleDateString()}`}
-      </Typography>
-      <Typography variant="body1">
-        {`${formatDate()}`}
-      </Typography>
-      {story.season_name && (
-        <Typography variant="body1">
-          {`Season: ${story.season_name}`}
-        </Typography>
-      )}
-    </Box>
-          {userId === story.author && (
-                <Button onClick={handleEditButtonClick}>Edit</Button>
-          )}
-          <div className='quill-container'>
-              
-              
+        <Box sx={{ borderRadius: "10px", boxShadow: "0 0 10px rgba(0,0,0,0.2)", p: 2, backgroundColor: "#f5f5f5" }}>
+          <Typography variant="h4" align="center" gutterBottom sx={{ mt: 1, mb: 3 }}>
+            {story.title}
+          </Typography>
+          <div className="content-container">
+            <div className="left-side">
+              <div className="quill-container">
                 <ReactQuill
-                className="story-content"
-                value={story.content}
-                readOnly={true}
-                modules={{ toolbar: false }}
-              />
-      
-              
-
-<Modal
-  open={open}
-  onClose={handleClose}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-  <ReactQuill
-                className="story-content"
-                value={editedContent}
-                readOnly={false}
-                onChange={setEditedContent}
-                modules={modules}
-              />
-                              <Button onClick={handleSaveButtonClick}>Save</Button>
-
-  </Box>
-</Modal>
-            
-          </div>
-          <p>{`tags: ${story.story_tags}`}</p>
-          <div> 
-          <button
-            onClick={handleLikeDislike}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-             <Heart isClick={liked} onClick={() => setLiked(!liked)}/>
-          </button>
-          <br/>
-          <span>{numLikes} </span>
-        </div>
-
-          {story.location_ids.length > 0 && (
-              <>
-                <div className='storydetail-story-map'>
-                  <GoogleMap
-                    mapContainerStyle={{ height: '400px', width: '400px' }}
-                    zoom={12}
-                    center={{
-                      lat: parseFloat(story.location_ids[0].latitude),
-                      lng: parseFloat(story.location_ids[0].longitude),
+                  className="story-content"
+                  value={story.content}
+                  readOnly={true}
+                  modules={{ toolbar: false }}
+                />
+                <Modal
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box className="story-edit-modal">
+                    <ReactQuill
+                      className="custom-input"
+                      value={editedContent}
+                      readOnly={false}
+                      onChange={setEditedContent}
+                      modules={modules}
+                    />
+                <div className="save-button-container">
+                    <Button onClick={handleSaveButtonClick}>Save</Button>
+                  </div>                  
+                  </Box>
+                </Modal>
+                {userId === story.author && (
+                <Button onClick={handleEditButtonClick}>Edit</Button>
+              )}
+              </div>
+            </div>
+            <div className="right-side">
+              {story.location_ids.length > 0 && (
+                <>
+                  <div className="storydetail-story-map">
+                    <GoogleMap
+                      mapContainerStyle={{ height: "400px", width: "400px" }}
+                      zoom={12}
+                      center={{
+                        lat: parseFloat(story.location_ids[0].latitude),
+                        lng: parseFloat(story.location_ids[0].longitude),
+                      }}
+                    >
+                      <StoryMarkers locations={story.location_ids} />
+                    </GoogleMap>
+                  </div>
+                </>
+              )}
+              <div className="author-date-container">
+              <div>
+                <Typography variant="subtitle1">Author</Typography>
+                <Chip
+                  label={story.author_username}
+                  onClick={() => handleUserClick(story.author)}
+                  color="primary"
+                  variant="outlined"
+                />
+              </div>
+              <div >
+                <Typography variant="subtitle1">Creation Date</Typography>
+                <Typography variant="body1" className="info-box">
+                  {new Date(story.creation_date).toLocaleDateString()}
+                </Typography>
+              </div>
+              <div className="like-container">
+                <div className="heart-container">
+                  <Button
+                    onClick={handleLikeDislike}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
                   >
-                    <StoryMarkers locations={story.location_ids} />
-                  </GoogleMap>
+                    <FavoriteIcon
+                      fontSize="small"
+                      style={{ color: liked ? 'red' : 'black' }}
+                      onClick={() => setLiked(!liked)}
+                    />
+                  </Button>
+                  <Chip label={numLikes} />
                 </div>
-              </>
+              </div>
+            </div>
+            </div>
+          </div>
+          <div className="bottom-container">
+            <div >
+              <Typography variant="subtitle1">Story Time</Typography>
+              <Typography variant="body1" className="info-box">{`${formatDate()}`}</Typography>
+            </div>
+            {story.season_name && (
+              <div>
+                <Typography variant="subtitle1">Season</Typography>
+                <Typography variant="body1" className="info-box">{story.season_name}</Typography>
+              </div>
             )}
-          <CommentSection storyId={id} comments={comments} setComments={setComments} />
-        </>
+            <div >
+              <Typography variant="subtitle1">Tags</Typography>
+              <div className="tags-container">
+                {story.story_tags
+                  .split(",")
+                  .map((tag, index) => (
+                    <div key={index} className="tag-box">
+                      <Typography variant="body1">{tag.trim()}</Typography>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+          <CommentSection
+            storyId={id}
+            comments={comments}
+            setComments={setComments}
+          />
+        </Box>
       ) : (
-        <p>Loading...</p>
+        <Typography variant="h5" align="center">
+          Loading story details...
+        </Typography>
       )}
-
-        
     </div>
-  );
+  );  
 }
 
 export default withAuth(StoryDetails);

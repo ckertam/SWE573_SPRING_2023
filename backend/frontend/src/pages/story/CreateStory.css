@@ -42,7 +42,7 @@
   width: 500px; 
   height: 200px; 
   resize: both; 
-  overflow: auto; 
+  /* overflow: auto;  */
   resize: none;
   margin: 0 auto;
   border-radius: '4px';

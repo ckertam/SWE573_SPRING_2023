@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from user.models import User,Story,Location,Comment,PhotoForStory,Content #, Date, SpecificDate, Decade, Season
+from user.models import User,Story,Location,Comment #, Date, SpecificDate, Decade, Season
 from rest_framework.fields import CharField
 from .functions import *
 import urllib.parse
@@ -106,8 +106,8 @@ class StorySerializer(serializers.ModelSerializer):
 
         if date_type == Story.YEAR_INTERVAL and (year is not None or date is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'year_interval' field should be set when 'date_type' is 'year_interval'.")
-        elif date_type == Story.DECADE and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
-            raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'decade'.")
+        elif date_type == Story.YEAR and (start_year is not None or end_year is not None or date is not None or start_date is not None or end_date is not None):
+            raise serializers.ValidationError("Only 'year' field should be set when 'date_type' is 'year'.")
         elif date_type == Story.NORMAL_DATE and (start_year is not None or end_year is not None or year is not None or start_date is not None or end_date is not None):
             raise serializers.ValidationError("Only 'date' field should be set when 'date_type' is 'normal_date'.")
         elif date_type == Story.INTERVAL_DATE and (start_year is not None or end_year is not None or year is not None or date is not None):
@@ -129,18 +129,6 @@ class StorySerializer(serializers.ModelSerializer):
         
         return story
 
-class StoryPhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PhotoForStory
-        fields = ('id', 'photo_for_story')
-
-class PhotoForStorySerializer(serializers.ModelSerializer):
-    story_id = serializers.ReadOnlyField(source='story.id')
-
-    class Meta:
-        model = PhotoForStory
-        fields = ('id', 'photo_for_story', 'story_id')
-
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
@@ -158,8 +146,3 @@ class CommentGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'comment_author','comment_author_id', 'story', 'text', 'date']
-
-class ContentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Content
-        fields = '__all__'

@@ -12,7 +12,7 @@ function ResetPasswordMain() {
   console.log(token)
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post(`http://localhost:8000/user/passwordReset/${token}/${uidb64}`, {
+    axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/passwordReset/${token}/${uidb64}`, {
       new_password: newPassword,
     }).then(response => {
       toast.success('Password has been reset.');

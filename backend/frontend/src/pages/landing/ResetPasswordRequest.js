@@ -11,7 +11,7 @@ function ResetPasswordRequest() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/user/passwordReset', {
+    axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/passwordReset`, {
       email: email,
     }).then(response => {
       toast.success('Password reset email sent.');

@@ -146,7 +146,7 @@ function CreateStory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/user/storyCreate', {
+      const response = await axios.post(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storyCreate`, {
         title: title,
         content: content,
         story_tags: story_tags,

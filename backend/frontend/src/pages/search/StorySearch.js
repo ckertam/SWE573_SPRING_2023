@@ -64,7 +64,7 @@ const StorySearch = () => {
     }
     
     try {
-      const response = await axios.get(`http://localhost:8000/user/storySearch`, {
+      const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/storySearch`, {
         params: {
             title: titleSearch,
             author: authorSearch,
