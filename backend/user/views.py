@@ -144,48 +144,48 @@ class UpdateStoryView(views.APIView):
             story.save()
             return Response("ok")
 
-class AddStoryPhotoView(views.APIView):
+# class AddStoryPhotoView(views.APIView):
 
-    def post(self, request, story_id, format=None):
+#     def post(self, request, story_id, format=None):
 
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
+#         cookie_value = request.COOKIES['refreshToken']
+#         user_id = decode_refresh_token(cookie_value)
 
-        story = Story.objects.get(pk=story_id)
+#         story = Story.objects.get(pk=story_id)
 
-        print(story.author.id)
-        print(user_id)
-        if story.author.id != user_id:
-            raise PermissionDenied()
+#         print(story.author.id)
+#         print(user_id)
+#         if story.author.id != user_id:
+#             raise PermissionDenied()
         
-        serializer = StoryPhotoSerializer(data=request.data)
+#         serializer = StoryPhotoSerializer(data=request.data)
 
-        if serializer.is_valid():
-            photo_for_story = serializer.save()
-            story.stories_photo.add(photo_for_story)
-            story.save()
+#         if serializer.is_valid():
+#             photo_for_story = serializer.save()
+#             story.stories_photo.add(photo_for_story)
+#             story.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, story_id, photo_id, format=None):
+#     def delete(self, request, story_id, photo_id, format=None):
 
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
+#         cookie_value = request.COOKIES['refreshToken']
+#         user_id = decode_refresh_token(cookie_value)
 
-        story = get_object_or_404(Story, pk=story_id)
+#         story = get_object_or_404(Story, pk=story_id)
 
-        print(story.author.id)
-        print(user_id)
-        if story.author.id != user_id:
-            raise PermissionDenied()
+#         print(story.author.id)
+#         print(user_id)
+#         if story.author.id != user_id:
+#             raise PermissionDenied()
 
-        # check if the photo exists for the story
-        photo_for_story = get_object_or_404(PhotoForStory, pk=photo_id, story=story)
+#         # check if the photo exists for the story
+#         photo_for_story = get_object_or_404(PhotoForStory, pk=photo_id, story=story)
 
-        photo_for_story.delete()
+#         photo_for_story.delete()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
     
 
@@ -402,12 +402,12 @@ class AllStoryView(views.APIView):
         }, status=status.HTTP_200_OK)
     
 
-class UsernamesByIDsView(views.APIView):
-    def get(self, request):
+# class UsernamesByIDsView(views.APIView):
+#     def get(self, request):
 
-        user_ids = request.GET.getlist('user_ids[]')
-        usernames = User.objects.filter(id__in=user_ids).values_list('username', flat=True)
-        return Response(list(usernames))
+#         user_ids = request.GET.getlist('user_ids[]')
+#         usernames = User.objects.filter(id__in=user_ids).values_list('username', flat=True)
+#         return Response(list(usernames))
 
 class UserDetailsView(views.APIView):
         
@@ -450,44 +450,44 @@ class UserBiographyView(views.APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StoryPhotosView(views.APIView):
-    def get(self, request, story_id, format=None):
+# class StoryPhotosView(views.APIView):
+#     def get(self, request, story_id, format=None):
 
-        cookie_value = request.COOKIES['refreshToken']
-        user_id = decode_refresh_token(cookie_value)
+#         cookie_value = request.COOKIES['refreshToken']
+#         user_id = decode_refresh_token(cookie_value)
 
-        story = Story.objects.get(pk=story_id)
-        photos = story.stories_photo.all()
+#         story = Story.objects.get(pk=story_id)
+#         photos = story.stories_photo.all()
 
-        page_number = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('size', 5))
+#         page_number = int(request.query_params.get('page', 1))
+#         page_size = int(request.query_params.get('size', 5))
 
-        # Paginate the photos
-        paginator = Paginator(photos, page_size)
-        total_pages = ceil(paginator.count / page_size)
-        page = paginator.get_page(page_number)
+#         # Paginate the photos
+#         paginator = Paginator(photos, page_size)
+#         total_pages = ceil(paginator.count / page_size)
+#         page = paginator.get_page(page_number)
 
-        response_data = []
-        for photo in photos:
-            file_ext = os.path.splitext(photo.photo_for_story.name)[-1].lower()
-            content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
-            data_url_prefix = 'data:' + content_type + ';base64,'
+#         response_data = []
+#         for photo in photos:
+#             file_ext = os.path.splitext(photo.photo_for_story.name)[-1].lower()
+#             content_type = 'image/jpeg' if file_ext == '.jpg' or file_ext == '.jpeg' else 'image/png'
+#             data_url_prefix = 'data:' + content_type + ';base64,'
 
-            with photo.photo_for_story.open('rb') as image_file:
-                base64_encoded_data = base64.b64encode(image_file.read()).decode('utf-8')
-                response_data.append({
-                    'id': photo.id,
-                    'photo_for_story': data_url_prefix + base64_encoded_data
-                })
+#             with photo.photo_for_story.open('rb') as image_file:
+#                 base64_encoded_data = base64.b64encode(image_file.read()).decode('utf-8')
+#                 response_data.append({
+#                     'id': photo.id,
+#                     'photo_for_story': data_url_prefix + base64_encoded_data
+#                 })
 
-        return Response({
-            'photos': response_data,
-            'has_next': page.has_next(),
-            'has_prev': page.has_previous(),
-            'next_page': page.next_page_number() if page.has_next() else None,
-            'prev_page': page.previous_page_number() if page.has_previous() else None,
-            'total_pages': total_pages,
-        }, status=status.HTTP_200_OK)
+#         return Response({
+#             'photos': response_data,
+#             'has_next': page.has_next(),
+#             'has_prev': page.has_previous(),
+#             'next_page': page.next_page_number() if page.has_next() else None,
+#             'prev_page': page.previous_page_number() if page.has_previous() else None,
+#             'total_pages': total_pages,
+#         }, status=status.HTTP_200_OK)
 
 class UserPhotoView(views.APIView):
 
@@ -692,13 +692,13 @@ class ResetPassword(views.APIView):
         else:
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
         
-class StoryDeleteAPIView(views.APIView):
-    def delete(self, request):
-        queryset = Story.objects.filter(
-            Q(season_name__isnull=False) & (
-                Q(year__isnull=True) & Q(end_date__isnull=True) &
-                Q(start_date__isnull=True) & Q(end_year__isnull=True) & Q(start_year__isnull=True)
-            )
-        )
-        queryset.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# class StoryDeleteAPIView(views.APIView):
+#     def delete(self, request):
+#         queryset = Story.objects.filter(
+#             Q(season_name__isnull=False) & (
+#                 Q(year__isnull=True) & Q(end_date__isnull=True) &
+#                 Q(start_date__isnull=True) & Q(end_year__isnull=True) & Q(start_year__isnull=True)
+#             )
+#         )
+#         queryset.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
