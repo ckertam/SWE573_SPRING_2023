@@ -24,8 +24,6 @@ class Location(models.Model):
     def __str__(self):
         return self.name    
     
-class PhotoForStory(models.Model):
-    photo_for_story = models.ImageField(upload_to='photo_for_Story/', blank=True, null=True)
 
 
 class Story(models.Model):
@@ -57,7 +55,6 @@ class Story(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date =models.DateField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='liked_stories', blank=True)
-    stories_photo = models.ManyToManyField(PhotoForStory, blank=True)
     
     def clean(self):
         # Custom validation to ensure only one date field is set
@@ -95,9 +92,3 @@ class PasswordResetToken(models.Model):
             self.expires_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
 
-class Content(models.Model):
-    title = models.CharField(max_length=200)
-    content = RichTextField()
-
-    def __str__(self):
-        return self.title
