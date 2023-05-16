@@ -54,6 +54,7 @@ class Story(models.Model):
     date = models.DateTimeField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date =models.DateTimeField(null=True, blank=True)
+    include_time = models.BooleanField(default=False)
     likes = models.ManyToManyField(User, related_name='liked_stories', blank=True)
     
     def clean(self):
