@@ -301,9 +301,9 @@ function CreateStory() {
             <div className='date-type'>
               <TextField
                 className='date-box'
-                label="Date"
+                label="Date Time"
                 variant="outlined"
-                type="date"
+                type="datetime-local"
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -313,19 +313,17 @@ function CreateStory() {
             <div className='date-type'>
               <TextField
                 className='date-box'
-                type="date"
-                label="Start Date"
+                type="datetime-local"
+                label="Start Date Time"
                 variant="outlined"
-                // style={{ background: '#FFFFFF' }}
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <TextField
                 className='date-box'
-                type="date"
-                label="End Date"
+                type="datetime-local"
+                label="End Date Time"
                 variant="outlined"
-                // style={{ background: '#FFFFFF' }}
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setEndDate(e.target.value)}
               />
