@@ -6,7 +6,7 @@ import withAuth from '../../authCheck';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './CreateStory.css'
-import {TextField, Select, MenuItem, InputLabel, FormControl, Button, List, ListItem, ListItemText } from '@mui/material';
+import {TextField, Select, MenuItem, InputLabel, FormControl, Button, List, ListItem, ListItemText,Checkbox, FormControlLabel } from '@mui/material';
 
 function CreateStory() {
 
@@ -25,6 +25,8 @@ function CreateStory() {
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
   const [firstClick, setFirstClick] = useState(true);
+  const [include_time, setIncludeTime] = useState(false);
+
   const navigate = useNavigate();
   const autocompleteRef = useRef(null);
   const inputRef = useRef(null);
@@ -158,7 +160,8 @@ function CreateStory() {
         year: year,
         date: date,
         start_date: start_date,
-        end_date: end_date
+        end_date: end_date,
+        include_time: include_time
       }, { withCredentials: true });
       console.log(response.data);
 
@@ -298,37 +301,55 @@ function CreateStory() {
             </div>
           }
           {date_type === 'normal_date' &&
-            <div className='date-type'>
-              <TextField
-                className='date-box'
-                label="Date Time"
-                variant="outlined"
-                type="datetime-local"
-                InputLabelProps={{ shrink: true }}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-          }
+              <div className='date-type'>
+                <TextField
+                  className='date-box'
+                  label="Date"
+                  variant="outlined"
+                  type={include_time ? "datetime-local" : "date"}
+                  InputLabelProps={{ shrink: true }}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={include_time}
+                      onChange={(e) => setIncludeTime(e.target.checked)}
+                    />
+                  }
+                  label="Include time"
+                />
+              </div>
+            }
             {date_type === 'interval_date' && (
-            <div className='date-type'>
-              <TextField
-                className='date-box'
-                type="datetime-local"
-                label="Start Date Time"
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <TextField
-                className='date-box'
-                type="datetime-local"
-                label="End Date Time"
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-          )}
+              <div className='date-type'>
+                <TextField
+                  className='date-box'
+                  type={include_time ? "datetime-local" : "date"}
+                  label="Start Date"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+                <TextField
+                  className='date-box'
+                  type={include_time ? "datetime-local" : "date"}
+                  label="End Date"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={include_time}
+                      onChange={(e) => setIncludeTime(e.target.checked)}
+                    />
+                  }
+                  label="Include time"
+                />
+              </div>
+            )}
           
           <Autocomplete 
             className='date-type'

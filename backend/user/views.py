@@ -604,8 +604,8 @@ class SearchStoryView(views.APIView):
                 given_date = datetime.strptime(time_value["date"], "%Y-%m-%d")
 
                 # Calculate the date range
-                start_date = given_date - timedelta(days=date_diff)
-                end_date = given_date + timedelta(days=date_diff)
+                start_date = given_date - timedelta(days=date_diff+1)
+                end_date = given_date + timedelta(days=date_diff+1)
                 query_filter &= Q(date__range=(start_date, end_date)) ##I can change the date to get 2 dates for interval on normal_date too
                 #time_value = time_value["date"]
                 ##query_filter &= Q(date=time_value)

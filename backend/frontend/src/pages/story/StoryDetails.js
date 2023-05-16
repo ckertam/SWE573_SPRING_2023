@@ -82,24 +82,38 @@ function StoryDetails() {
   
 
   const formatDate = () => {
-    // format the date based on the date_type of the story
+
+    let dateString = "";
+    const optionsWithoutTime = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+
+    const dateOptions = story.include_time ? options : optionsWithoutTime;
+  
     switch (story.date_type) {
-      case 'year':
-        return `Year: ${story.year}`;
-      case 'year_interval':
+      case "year":
+        dateString = `Year: ${story.year}`;
+        break;
+      case "year_interval":
         const startYear = story.start_year;
         const endYear = story.end_year;
-        return `Start: ${startYear} \n End: ${endYear}`;
-      case 'normal_date':
-        const date = new Date(story.date).toLocaleDateString('en-US', options)
-        return `${date}`;
-      case 'interval_date':
-        const startDate = new Date(story.start_date).toLocaleDateString('en-US', options);
-        const endDate = new Date(story.end_date).toLocaleDateString('en-US', options);
-        return `Start: ${startDate} \n End: ${endDate}`;
+        dateString = `Start: ${startYear} \n End: ${endYear}`;
+        break;
+      case "normal_date":
+        const date = new Date(story.date).toLocaleDateString("en-US", dateOptions);
+        dateString = `${date}`;
+        break;
+      case "interval_date":
+        const startDate = new Date(story.start_date).toLocaleDateString("en-US", dateOptions);
+        const endDate = new Date(story.end_date).toLocaleDateString("en-US", dateOptions);
+        dateString = `Start: ${startDate} \n End: ${endDate}`;
+        break;
       default:
-        return '';
+        dateString = "";
     }
+    return dateString;
   };
 
 
