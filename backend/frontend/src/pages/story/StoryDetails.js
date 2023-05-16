@@ -33,7 +33,13 @@ function StoryDetails() {
   // const PHOTOS_PER_PAGE = 3;
   const COMMENTS_PER_PAGE = 5;
 
-  
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
 
   const fetchUserDetails = async () => {
     try {
@@ -83,14 +89,14 @@ function StoryDetails() {
       case 'year_interval':
         const startYear = story.start_year;
         const endYear = story.end_year;
-        return `Start Year: ${startYear} \n End Year: ${endYear}`;
+        return `Start: ${startYear} \n End: ${endYear}`;
       case 'normal_date':
-        const date = new Date(story.date).toLocaleDateString()
-        return `Date: ${date}`;
+        const date = new Date(story.date).toLocaleDateString('en-US', options)
+        return `${date}`;
       case 'interval_date':
-        const startDate = new Date(story.start_date).toLocaleDateString();
-        const endDate = new Date(story.end_date).toLocaleDateString();
-        return `Start Date: ${startDate} \n End Date: ${endDate}`;
+        const startDate = new Date(story.start_date).toLocaleDateString('en-US', options);
+        const endDate = new Date(story.end_date).toLocaleDateString('en-US', options);
+        return `Start: ${startDate} \n End: ${endDate}`;
       default:
         return '';
     }

@@ -166,9 +166,9 @@ const StorySearch = () => {
           <div className='date-type-search'>
               <TextField
                 className='date-box-search'
-                label="Date"
+                label="Date Time"
                 variant="outlined"
-                type="date"
+                type="datetime-local"
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -179,19 +179,17 @@ const StorySearch = () => {
           <div className='date-type-search'>
               <TextField
                 className='date-box-search'
-                type="date"
-                label="Start Date"
+                type="datetime-local"
+                label="Start Date Time"
                 variant="outlined"
-                // style={{ background: '#FFFFFF' }}
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <TextField
                 className='date-box-search'
-                type="date"
-                label="End Date"
+                type="datetime-local"
+                label="End Date Time"
                 variant="outlined"
-                // style={{ background: '#FFFFFF' }}
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => setEndDate(e.target.value)}
               />

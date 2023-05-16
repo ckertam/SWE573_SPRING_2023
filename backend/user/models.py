@@ -51,9 +51,9 @@ class Story(models.Model):
     start_year = models.PositiveIntegerField(null=True, blank=True)
     end_year = models.PositiveIntegerField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
-    date = models.DateField(null=True, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date =models.DateField(null=True, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date =models.DateTimeField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='liked_stories', blank=True)
     
     def clean(self):
