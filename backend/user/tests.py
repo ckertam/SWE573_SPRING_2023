@@ -110,3 +110,136 @@ class CommentModelTest(TestCase):
         self.assertEqual(self.comment.story, self.story)
         self.assertEqual(self.comment.text, "This is a test comment.")
 
+client = APIClient()
+
+class UserRegistrationViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = UserRegistrationView.as_view()
+
+    def test_user_registration_view(self):
+        data = {
+            "username": "testuser",
+            "email": "testuser@example.com",
+            "password": "testpassword",
+            "password_again": "testpassword"
+        }
+        response = self.client.post(reverse('register'), data)
+        self.assertEqual(response.status_code, 201)
+
+class UserLoginViewTestCase(APITestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = UserLoginView.as_view()
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="testpassword"
+        )
+        self.client = APIClient()
+
+    def test_user_login_view(self):
+        data = {
+            "username": "testuser",
+            "password": "testpassword"
+        }
+        response = self.client.post(reverse('login'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        self.assertIn('refreshToken', response.cookies)
+
+    def test_user_login_view_invalid_credentials(self):
+        data = {
+            "username": "testuser",
+            "password": "wrongpassword"
+        }
+        response = self.client.post(reverse('login'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('error', response.data)
+
+
+class CreateStoryViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = CreateStoryView.as_view()
+        self.user = User.objects.create_user(username='testuser', email='testuser@example.com', password='testpassword')
+        
+        refresh_token = create_refresh_token(self.user.id)
+        user_id = get_user_id_from_token(refresh_token)
+        user = User.objects.get(id=user_id)
+        self.client.force_authenticate(user=user)
+
+class LogoutAPIViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = LogoutAPIView.as_view()
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+
+    def test_logout_api_view(self):
+        request = self.factory.post(reverse('logout'))
+        request.user = self.user
+        refresh_token = create_refresh_token(self.user.id)
+        request.COOKIES['refreshToken'] = refresh_token
+
+        response = self.view(request)
+        self.assertEqual(response.status_code, 200)
+
+class UpdateStoryViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = UpdateStoryView.as_view()
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.story = Story.objects.create(
+            author=self.user,
+            title="Test Story",
+            content="<p>This is a test story.</p>",
+            story_tags="test, story",
+            date=datetime(2023, 5, 15)
+        )
+
+    def test_update_story_view(self):
+        # Add updated content to request data
+        updated_data = {
+            'content': '<p>This is an updated test story.</p>'
+        }
+
+        request = self.factory.put(reverse('storyUpdate', args=[self.story.pk]), data=updated_data, content_type='application/json')
+        request.user = self.user
+        refresh_token = create_refresh_token(self.user.id)
+        request.COOKIES['refreshToken'] = refresh_token
+
+        response = self.view(request, pk=self.story.pk)
+        self.assertEqual(response.status_code, 200)
+
+
+class CreateCommentViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = CreateCommentView.as_view()
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.story = Story.objects.create(
+            author=self.user,
+            title="Test Story2",
+            content="<p>This is a test story.</p>",
+            story_tags="test, story",
+            year=1996,
+            season_name="Spring"
+        )
+
+    def test_create_comment_view(self):
+        comment_data = {
+            'text': 'This is a test comment.'
+        }
+        
+        request = self.factory.post(reverse('comment', args=[self.story.pk]), data=comment_data)
+        request.user = self.user
+        refresh_token = create_refresh_token(self.user.id)
+        request.COOKIES['refreshToken'] = refresh_token
+
+        response = self.view(request, id=self.story.pk)
+        self.assertEqual(response.status_code, 201)
+
+        self.client = APIClient()
+        self.client.login(username='testuser', password='testpassword')
+
