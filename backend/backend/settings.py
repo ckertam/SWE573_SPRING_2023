@@ -37,7 +37,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '34.173.225.192',
+    env('BACKEND_HOST_IP', default='127.0.0.1')
 ]
 
 
@@ -182,10 +182,12 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 
+backend_host_ip = env('BACKEND_HOST_IP')
+
 #CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "HTTP://34.173.225.192:3000", 
+    f"http://{backend_host_ip}:3000", 
 ]
 
 CKEDITOR_CONFIGS = {
