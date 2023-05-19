@@ -575,10 +575,13 @@ class SearchStoryView(views.APIView):
         location = request.query_params.get('location', '')
         radius_diff = float(request.query_params.get('radius_diff', ''))
         date_diff = float(request.query_params.get('date_diff', ''))
+        tag_search = request.query_params.get('tag', '')
 
         query_filter = Q()
         if title_search:
             query_filter &= Q(title__icontains=title_search)
+        if tag_search:
+            query_filter &= Q(title__icontains=tag_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
         # print(time_type)
@@ -624,6 +627,8 @@ class SearchStoryView(views.APIView):
                 location_ids__latitude__range=(lat - radius / 110.574, lat + radius / 110.574),
                 location_ids__longitude__range=(lng - radius / (111.320 * cos(radians(lat))), lng + radius / (111.320 * cos(radians(lat))))
             )
+        
+        
         stories = Story.objects.filter(query_filter)
 
         # Page sizes and numbers
