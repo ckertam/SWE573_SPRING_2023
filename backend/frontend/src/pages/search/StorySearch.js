@@ -11,6 +11,7 @@ import {TextField, Select, MenuItem, InputLabel, FormControl,Slider, Button,List
 const StorySearch = () => {
   const [titleSearch, setTitleSearch] = useState('');
   const [authorSearch, setAuthorSearch] = useState('');
+  const [tagSearch, setTagSearch] = useState('');
   const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -68,6 +69,7 @@ const StorySearch = () => {
         params: {
             title: titleSearch,
             author: authorSearch,
+            tag: tagSearch, 
             page: pageNumber,
             size: pageSize,
             time_type: timeType,
@@ -292,6 +294,16 @@ const StorySearch = () => {
         label="Search by Author" 
         value={authorSearch}
         onChange={(e) => setAuthorSearch(e.target.value)}
+      />
+      <br />
+      <br />
+            <TextField
+        variant="outlined"
+        placeholder="Tag"
+        className='long-boxes-search'
+        label="Search by Tag" 
+        value={tagSearch}
+        onChange={(e) => setTagSearch(e.target.value)}
       />
       <br />
       <div style={{ marginTop: '1rem' }}>
