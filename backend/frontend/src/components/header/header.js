@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef} from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './header.css';
 import axios from 'axios';
 import UserSearch from './UserSearch';
@@ -18,12 +18,13 @@ import mainPhoto from '../../assets/images/homePage4.png'
 import ResetPasswordRequest from '../../pages/landing/ResetPasswordRequest';
 import ResetPasswordMain from '../../pages/landing/ResetPasswordMain';
 
+
 function Header() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   //const isLoggedIn = withAuth();
-
+  
   const fetchUserDetails = async () => {
     try {
       const response = await axios.get(`http://${process.env.REACT_APP_BACKEND_HOST_NAME}:8000/user/user`, { withCredentials: true });
@@ -77,6 +78,7 @@ function Header() {
           <Routes>
           {!isLoggedIn && (
               <>
+            <Route path="*" element={<Navigate to="/" />} />
             <Route path="/" element={
                   <div className="home-container">
                     <img
@@ -95,6 +97,7 @@ function Header() {
             
             {isLoggedIn && (
               <>
+            <Route path="*" element={<Navigate to="/homepage" />} />
             <Route path="/homepage" element={<StoryContainer />} />
             <Route path="/create-story" element={<CreateStory />} />
             <Route path="/story/:id" element={<StoryDetails />} />
