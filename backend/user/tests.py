@@ -19,6 +19,7 @@ def get_jwt_for_user(user):
 def get_user_id_from_token(token):
     user_id = decode_refresh_token(token)
     return user_id
+
 class UserModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -165,10 +166,37 @@ class CreateStoryViewTestCase(TestCase):
         self.view = CreateStoryView.as_view()
         self.user = User.objects.create_user(username='testuser', email='testuser@example.com', password='testpassword')
         
+    def test_create_story_view(self):
+    # Assuming 'location_ids' is a list of locations,
+    # and each location only contains a 'name' field.
+        location_data = [
+            {'name': 'location1', 'latitude': 12.3456789, 'longitude': 98.7654321},
+            {'name': 'location2', 'latitude': 12.3456789, 'longitude': 98.7654321},
+        ]
+
+        story_data = {
+            'title': 'Test Story',
+            'content': '<p>This is a test story.</p>',
+            'story_tags': 'test, story',
+            'location_ids': location_data,
+            'date_type': Story.YEAR,
+            'season_name': 'Spring',
+            'year': 1996,
+        }
+
+        request = self.factory.post(reverse('createStory'), data=json.dumps(story_data), content_type='application/json')
+        request.user = self.user
         refresh_token = create_refresh_token(self.user.id)
-        user_id = get_user_id_from_token(refresh_token)
-        user = User.objects.get(id=user_id)
-        self.client.force_authenticate(user=user)
+        request.COOKIES['refreshToken'] = refresh_token
+
+        response = self.view(request)
+        self.assertEqual(response.status_code, 201)
+
+        # Login for subsequent tests if required
+        self.client = APIClient()
+        self.client.login(username='testuser', password='testpassword')
+
+
 
 class LogoutAPIViewTestCase(TestCase):
     def setUp(self):
