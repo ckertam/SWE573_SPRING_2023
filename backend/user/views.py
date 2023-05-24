@@ -488,11 +488,12 @@ class SearchStoryView(views.APIView):
         date_diff = float(request.query_params.get('date_diff', ''))
         tag_search = request.query_params.get('tag', '')
 
+        print(tag_search)
         query_filter = Q()
         if title_search:
             query_filter &= Q(title__icontains=title_search)
         if tag_search:
-            query_filter &= Q(title__icontains=tag_search)
+            query_filter &= Q(story_tags__icontains=tag_search)
         if author_search:
             query_filter &= Q(author__username__icontains=author_search)
         # print(time_type)
@@ -505,9 +506,9 @@ class SearchStoryView(views.APIView):
                 time_value = time_value["seasonName"]
                 query_filter &= Q(season_name__icontains=time_value)
             elif time_type == 'year':
-                time_value = time_value["year"]
+                year_value = time_value["year"]
                 season_value = time_value["seasonName"]
-                query_filter &= Q(season_name__icontains=season_value, year__e=time_value)
+                query_filter &= Q(season_name__icontains=season_value, year__exact=year_value)
             elif time_type == 'year_interval':
                 start_year = time_value["startYear"]
                 end_year = time_value["endYear"]
@@ -520,6 +521,8 @@ class SearchStoryView(views.APIView):
                 # Calculate the date range
                 start_date = given_date - timedelta(days=date_diff+1)
                 end_date = given_date + timedelta(days=date_diff+1)
+                print(start_date)
+                print(end_date)
                 query_filter &= Q(date__range=(start_date, end_date)) ##I can change the date to get 2 dates for interval on normal_date too
                 #time_value = time_value["date"]
                 ##query_filter &= Q(date=time_value)

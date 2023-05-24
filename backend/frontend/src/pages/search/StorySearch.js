@@ -103,7 +103,7 @@ const StorySearch = () => {
             className='date-box-search'
             label="Year"
             variant="outlined"
-            type="text"
+            type="number"
             onChange={(e) => setYear(e.target.value)}
           />
           <FormControl variant="outlined">
