@@ -255,7 +255,7 @@ const StorySearch = () => {
   };
 
   const renderDateDiffInput = () => {
-    if (timeType === 'normal_date' || timeType === 'interval_date') {
+    if (timeType === 'normal_date') {
       return (
         <div className='date-type-search'>
         <TextField 

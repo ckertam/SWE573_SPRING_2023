@@ -7,7 +7,7 @@ urlpatterns = [
     path('user', AuthUserAPIView.as_view()),
     path('refresh', RefreshUserAuthAPIView.as_view()),
     path('logout', LogoutAPIView.as_view(),name="logout"),
-    path('storyCreate',CreateStoryView.as_view()),
+    path('storyCreate',CreateStoryView.as_view(),name="createStory"),
     path('storyUpdate/<int:pk>', UpdateStoryView.as_view(),name="storyUpdate"),
     path('like/<int:pk>',LikeStoryView.as_view()),
     path('storyGet/<int:pk>', StoryDetailView.as_view()),
