@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
@@ -240,6 +240,9 @@ const StorySearch = () => {
     setLocationSearch(locationData);
     setMapCenter({ lat: locationData.latitude, lng: locationData.longitude });
   };
+  useEffect(() => {
+    setMarkerPosition(mapCenter);
+  }, [mapCenter]);
 
   const handleMarker = (e) => {
     const newPosition = {
@@ -335,6 +338,7 @@ const StorySearch = () => {
               autocompleteRef.current = autocomplete;
             }}
             onPlaceChanged={handleLocationSelect}
+
           >
             <TextField 
               className='date-box-search'
