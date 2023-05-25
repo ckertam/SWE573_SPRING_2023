@@ -508,12 +508,12 @@ class SearchStoryView(views.APIView):
             elif time_type == 'year':
                 year_value = time_value["year"]
                 season_value = time_value["seasonName"]
-                query_filter &= Q(season_name__icontains=season_value, year__exact=year_value)
+                query_filter &= Q(season_name__icontains=season_value, year__exact=year_value) | Q(date__year__exact=year_value) | Q(start_date__year__exact=year_value) | Q(end_date__year__exact=year_value)
             elif time_type == 'year_interval':
                 start_year = time_value["startYear"]
                 end_year = time_value["endYear"]
                 season_value = time_value["seasonName"]
-                query_filter &= Q(season_name__icontains=season_value, start_year__gte=start_year, end_year__lte=end_year) ##here can be change for now it shows greater than of that year
+                query_filter &= Q(season_name__icontains=season_value, start_year__gte=start_year, end_year__lte=end_year) | Q(year__range=(start_year, end_year)) | Q(date__year__range=(start_year, end_year)) ##here can be change for now it shows greater than of that year
             elif time_type == 'normal_date':
 
                 given_date = datetime.strptime(time_value["date"], "%Y-%m-%d")
@@ -531,6 +531,13 @@ class SearchStoryView(views.APIView):
                     start_date__gte=time_value['startDate'],
                     end_date__lte=time_value['endDate']
                 )
+            elif time_type == 'decade':
+                decade_value = time_value["decade"]
+                start_year = decade_value
+                end_year = decade_value + 9
+                query_filter &= Q(decade__exact=decade_value) | Q(year__range=(start_year, end_year)) | Q(date__year__range=(start_year, end_year)) | Q(start_date__year__range=(start_year, end_year)) | Q(end_date__year__range=(start_year, end_year))
+
+
         if location != "null":
             location = json.loads(location)
             lat = location['latitude']
@@ -543,7 +550,7 @@ class SearchStoryView(views.APIView):
             )
         
         
-        stories = Story.objects.filter(query_filter)
+        stories = Story.objects.filter(query_filter).order_by('-creation_date')
 
         # Page sizes and numbers
         page_number = int(request.query_params.get('page', 1))
