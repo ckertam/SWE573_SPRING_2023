@@ -22,6 +22,7 @@ function CreateStory() {
   const [date, setDate] = useState(null);
   const [start_date, setStartDate] = useState(null);
   const [end_date, setEndDate] = useState(null);
+  const [decade, setDecade] = useState(null);
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [searchBox, setSearchBox] = useState(null);
   const [firstClick, setFirstClick] = useState(true);
@@ -88,6 +89,7 @@ function CreateStory() {
     setDate(null);
     setStartDate(null);
     setEndDate(null);
+    setDecade(null);
   }, [date_type]);
 
   const handleMapClick = async (e) => {
@@ -120,22 +122,6 @@ function CreateStory() {
     setLocations(location_ids.filter((loc, i) => i !== index));
   };
 
-  // const handlePlacesChanged = () => {
-  //   const place = searchBox.getPlaces()[0];
-  //   if (place) {
-  //     const locationData = {
-  //       name: place.name,
-  //       latitude: Number(place.geometry.location.lat().toFixed(6)),
-  //       longitude: Number(place.geometry.location.lng().toFixed(6)),
-  //     };
-  //     setLocations([...location_ids, locationData]);
-  //   }
-  // };
-
-  const handleContentChange = (value) => {
-    setContent(value);
-  };
-
   const handleEditorClick = () => {
     if (firstClick) {
       setContent('');
@@ -161,6 +147,7 @@ function CreateStory() {
         date: date,
         start_date: start_date,
         end_date: end_date,
+        decade: decade,
         include_time: include_time
       }, { withCredentials: true });
       console.log(response.data);
@@ -231,6 +218,7 @@ function CreateStory() {
                   <MenuItem value="year_interval">Interval Year</MenuItem>
                   <MenuItem value="normal_date">Normal Date</MenuItem>
                   <MenuItem value="interval_date">Interval Date</MenuItem>
+                  <MenuItem value="decade">Decade</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -350,6 +338,35 @@ function CreateStory() {
                 />
               </div>
             )}
+            {date_type === 'decade' &&
+                <div className='date-type'>
+                    <FormControl variant="outlined" className='date-box'>
+                        <InputLabel id="decade-label">Decade</InputLabel>
+                        <Select
+                            labelId="decade-label"
+                            id="decade"
+                            value={decade}
+                            onChange={(e) => setDecade(e.target.value)}
+                            label="Decade"
+                        >
+                            <MenuItem value="">Select a decade</MenuItem>
+                            <MenuItem value={1900}>1900s</MenuItem>
+                            <MenuItem value={1910}>1910s</MenuItem>
+                            <MenuItem value={1920}>1920s</MenuItem>
+                            <MenuItem value={1930}>1930s</MenuItem>
+                            <MenuItem value={1940}>1940s</MenuItem>
+                            <MenuItem value={1950}>1950s</MenuItem>
+                            <MenuItem value={1960}>1960s</MenuItem>
+                            <MenuItem value={1970}>1970s</MenuItem>
+                            <MenuItem value={1980}>1980s</MenuItem>
+                            <MenuItem value={1990}>1990s</MenuItem>
+                            <MenuItem value={2000}>2000s</MenuItem>
+                            <MenuItem value={2010}>2010s</MenuItem>
+                            <MenuItem value={2020}>2020s</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+            }                             
           
           <Autocomplete 
             className='date-type'

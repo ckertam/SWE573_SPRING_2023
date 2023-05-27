@@ -93,6 +93,9 @@ function StoryDetails() {
     const dateOptions = story.include_time ? options : optionsWithoutTime;
   
     switch (story.date_type) {
+      case "decade":
+        dateString = `Decade: ${story.decade}s`;
+        break;
       case "year":
         dateString = `Year: ${story.year}`;
         break;

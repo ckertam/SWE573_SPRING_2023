@@ -31,12 +31,14 @@ class Story(models.Model):
     YEAR = 'year'
     NORMAL_DATE = 'normal_date'
     INTERVAL_DATE = 'interval_date'
+    DECADE = 'decade'
     
     DATE_TYPES = [
         (YEAR_INTERVAL, 'Year Interval'),
         (YEAR, 'year'),
         (NORMAL_DATE, 'Normal Date'),
         (INTERVAL_DATE, 'Interval Date'),
+        (DECADE, 'Decade'),
     ]
 
 
@@ -50,6 +52,7 @@ class Story(models.Model):
     season_name = models.CharField(max_length=255, null=True, blank=True)
     start_year = models.PositiveIntegerField(null=True, blank=True)
     end_year = models.PositiveIntegerField(null=True, blank=True)
+    decade = models.PositiveIntegerField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
     date = models.DateTimeField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
@@ -60,9 +63,9 @@ class Story(models.Model):
     def clean(self):
         # Custom validation to ensure only one date field is set
 
-        date_fields = [self.start_year, self.year, self.date, self.end_date]
+        date_fields = [self.start_year, self.year, self.date, self.end_date, self.decade]
         print(date_fields)
-        if date_fields.count(None) != 3:
+        if date_fields.count(None) != 4:
             raise ValidationError("Only one type of date field should be set.")
 
     def save(self, *args, **kwargs):
